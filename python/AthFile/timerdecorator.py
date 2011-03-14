@@ -5,8 +5,26 @@
 #   http://code.activestate.com/recipes/483752/
 
 import sys
+import os
 import threading
 
+if 'linux' in sys.platform.lower():
+    def _run_from_valgrind():
+        """
+        helper function to detect if one runs under valgrind or not
+        """
+        for l in open('/proc/self/maps'):
+            if '/valgrind' in l:
+                return True
+        return False
+
+else: # mac-os
+    def _run_from_valgrind():
+        """
+        helper function to detect if one runs under valgrind or not
+        """
+        return 'VALGRIND_STARTUP_PWD' in os.environ
+    
 class TimeoutError(Exception):
     pass
 
@@ -27,6 +45,9 @@ def timelimit(timeout):
             
             c = Calculator()
             c.start()
+            if _run_from_valgrind():
+                # don't set any timeout under valgrind...
+                timeout = None
             c.join(timeout)
             if c.isAlive():
                 raise TimeoutError

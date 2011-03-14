@@ -1,5 +1,9 @@
 2011-03-14  Sebastien Binet  <sebastien.binet@cern.ch>
 
+	* tagging PyUtils-00-10-59
+	* do not set any timeout when run from within valgrind
+	* M python/AthFile/timerdecorator.py
+
 	* tagging PyUtils-00-10-58
 	* make sure PoolFile.checkFile gets AtlasCore as an environment
 	  as some reflex dicts load StoreGateSvc as a side effect
