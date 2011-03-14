@@ -291,9 +291,8 @@ def extract_streams_from_tag (fname,
     """
     
     import sys
-    sys.argv.insert(1, '-b')
-    import ROOT; ROOT.gROOT.SetBatch(True)
-    del sys.argv[1]
+    import PyUtils.RootUtils as ru
+    ROOT = ru.import_root()
     import PyCintex; PyCintex.Cintex.Enable()
 
     print "::: opening file [%s]..." % fname
@@ -545,9 +544,9 @@ class PoolFile(object):
             self.dataHeader = report['dataHeader']
             self.data       = report['data']
         else:
-            import Helpers
-            projects = 'LCGCMT' if PoolOpts.FAST_MODE else None
-            with Helpers.restricted_ldenviron (projects=projects):
+            import PyUtils.Helpers as _H
+            projects = 'AtlasCore' if PoolOpts.FAST_MODE else None
+            with _H.restricted_ldenviron (projects=projects):
                 print "## opening file [%s]..." % str(fileName)
                 self.__openPoolFile( fileName )
                 print "## opening file [OK]"
@@ -558,17 +557,15 @@ class PoolFile(object):
     def __openPoolFile(self, fileName):
         # hack to prevent ROOT from loading graphic libraries and hence bother
         # our fellow Mac users
-        oldArgs = sys.argv
-        sys.argv = sys.argv[:1] + ['-b'] + sys.argv[1:]
         print "## importing ROOT..."
-        import ROOT
+        import PyUtils.RootUtils as ru
+        ROOT = ru.import_root()
         print "## importing ROOT... [DONE]"
         # prevent ROOT from being too verbose
         rootMsg = ShutUp()
         rootMsg.mute()
         ROOT.gErrorIgnoreLevel = ROOT.kFatal
         rootMsg.unMute()
-        sys.argv = oldArgs
 
         import PyCintex
         PyCintex.Cintex.Enable()
