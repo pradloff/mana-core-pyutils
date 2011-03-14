@@ -1,0 +1,1970 @@
+2011-01-14  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-50
+	* fixing bug 77026: opening non-ROOT files in non-RAW mode was
+	  raising an IOError.
+	* M python/AthFile/impl.py
+
+2011-01-13  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-49
+	* raise a proper IOError when fopen fails to open a file
+	* M python/AthFile/impl.py
+
+2011-01-03  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-48
+	* fix utest
+	* M python/AthFile/tests.py
+
+2010-12-21  Sebastien Binet  <binet@voatlas51.cern.ch>
+
+	* tagging PyUtils-00-10-47
+	* improved root-file dumper and comparator
+	* R bin/dump-root-file.py
+	* M python/RootUtils.py
+	* M python/scripts/__init__.py
+	* M python/scripts/diff_root_files.py
+	* A python/scripts/dump_root_file.py
+	* M cmt/requirements
+
+2010-12-20  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-46
+	* use flattening pyroot-inspector + add a WIP dump-root-file script
+	* A bin/dump-root-file.py
+	* M python/scripts/diff_root_files.py
+	* M cmt/requirements
+
+2010-12-15  Sebastien Binet  <binet@voatlas51.cern.ch>
+
+	* tagging PyUtils-00-10-45
+	* more compact output for diff-root
+	* M python/scripts/diff_root_files.py
+
+2010-12-06  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-44
+	* restore compat w/ py-2.5
+	* restore re-ordering for all output files
+	* M bin/filter-and-merge-d3pd.py
+
+2010-11-23  Sebastien Binet  <binet@voatlas51.cern.ch>
+
+	* tagging PyUtils-00-10-43
+	* first attempt at fixing bug #75515
+	  be stricter at closing ROOT files as we go
+	* M bin/filter-and-merge-d3pd.py
+
+2010-11-10  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-42
+	* typo-proof version of filter-fct
+	* M bin/filter-and-merge-d3pd.py
+
+	* tagging PyUtils-00-10-41
+	* adding a user filter-fct
+	* M bin/filter-and-merge-d3pd.py
+
+	* tagging PyUtils-00-10-40
+	* fixing efficiency computation bug (integer division!)
+	* M bin/filter-and-merge-d3pd.py
+
+2010-11-02  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-39
+	* allow to specify the branches to remove from the merging
+	* M bin/filter-and-merge-d3pd.py
+
+2010-10-29  Sebastien Binet  <binet@voatlas51.cern.ch>
+
+	* tagging PyUtils-00-10-38
+	* improve filter to be able to craft an empty output file when all input files are
+	  empty (or branches are empty) to deal with small filtered out d3pds.
+	  also makes the GRID gods happy (an output file is always present)
+	* M bin/filter-and-merge-d3pd.py
+
+2010-10-27  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-37
+	* extract additional metadata (geometry+conditions_tag) from bs files
+	* M python/AthFile/impl.py
+
+2010-10-04  Sebastien Binet  <binet@voatlas51.cern.ch>
+
+	* tagging PyUtils-00-10-36
+	* bump pep8-0.6.1
+	* M bin/pep8.py
+
+2010-09-28  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-35
+	* fixing missing import of 're'
+	* M python/castor.py
+
+2010-09-27  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-34
+	* handle bug #73208 : if in presence of a fixed-up eformat library,
+	  try to leverage the extended API and fill bs_metadata
+	* M python/AthFile/impl.py
+
+2010-09-24  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-33
+	* make use of .asetup.save informations when available
+	* M bin/abootstrap-wkarea.py
+	* M bin/setupWorkArea.py
+	* M python/WorkAreaLib.py
+
+2010-09-23  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-32
+	* fwd porting fix for bug #72323
+	  robuster handling in the face of empty files (checkFile)
+	* M python/PoolFile.py
+
+2010-09-20  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-31
+	* bump pep8-0.6.0
+	* disable known-to-fail AthFile-utest
+	* M bin/pep8.py
+	* M python/AthFile/tests.py
+
+2010-09-06  Frank Winklmeier  <fwinkl@cern>
+
+	* tagging PyUtils-00-10-30
+	* M bin/pkgco.py: Fix for python >=2.6: Remove BaseException.message usage
+
+2010-08-27  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-29
+	* try hard to prevent athena-peeking jobs to run in athena-mp mode
+	* M python/AthFile/impl.py
+
+2010-08-26  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-28
+	* fix utests
+	* M python/AthFile/tests.py
+
+2010-08-25  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-27
+	* enable post-install hooks
+	* M python/WorkAreaLib.py
+
+	* tagging PyUtils-00-10-26
+	* update utests
+	* M python/AthFile/tests.py
+
+2010-08-19  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-25
+	* fixing bug 71520: better handling of AMI datasets containers
+	* M python/AthFile/impl.py
+
+	* tagging PyUtils-00-10-24
+	* fixing bug 71510: better handling of TAG files
+	* M python/PoolFile.py
+
+	* tagging PyUtils-00-10-23
+	* more robust handling in the face of empty files (checkFile)
+	* improved castor module
+	* improved gen_klass generation
+	* improved diff-root-files script
+	* M python/PoolFile.py
+	* M python/RootUtils.py
+	* M python/castor.py
+	* M python/scripts/gen_klass.py
+	* M python/scripts/diff_root_files.py
+
+2010-07-16  Sebastien Binet  <binet@pb-d-128-141-71-201.cern.ch>
+
+	* tagging PyUtils-00-10-22
+	* new pyroot script to filter, reorder (baskets) and merge d3pd files
+	* A bin/filter-and-merge-d3pd.py
+
+2010-07-15  Sebastien Binet  <binet@pb-d-128-141-71-201.cern.ch>
+
+	* tagging PyUtils-00-10-21
+	* fixed handling of logfile command-line argument of merge-files
+	* M python/scripts/merge_files.py
+
+2010-07-13  Sebastien Binet  <binet@pb-d-128-141-71-201.cern.ch>
+
+	* tagging PyUtils-00-10-20
+	* py26 fixes
+	* M python/path.py
+
+2010-06-23  binet  <binet@pb-d-128-141-128-224.cern.ch>
+
+	* tagging PyUtils-00-10-19
+	* better fix for bug #67241
+	* silence warning for http-served via xrootd files
+	* M python/PoolFile.py
+	* M python/AthFile/impl.py
+
+2010-06-22  binet  <binet@pb-d-128-141-128-224.cern.ch>
+
+	* tagging PyUtils-00-10-18
+	* address bug #67241 - fix catalogues' merging
+	* M python/PoolFile.py
+
+2010-05-26  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-17
+	* properly escape xml special character (gt and lt)
+	* fix logic bug
+	* M python/xmldict.py
+	* M python/WorkAreaLib.py
+
+2010-05-12  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-16
+	* adding a script to compare joboptions configurations as extracted
+	  by find_cfg_dups.py.
+	  initial version by Adrien Renaud.
+	* A bin/diff-jobo-cfg.py
+	* M cmt/requirements
+
+2010-05-11  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-15
+	* provide a way to transfer parent os.environ to AthFileServer
+	* M python/AthFile/__init__.py
+	* M python/AthFile/impl.py
+
+2010-04-16  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-14
+	* remove the proper normalization of localfs files
+	  (symlinks,realpath,...) as it confuses AthenaPOOL.
+	* fix bug #65855
+	* M python/AthFile/impl.py
+
+2010-04-15  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-13
+	* better ambiguity detection for acmd tc find-pkg
+	* better error reporting when file cannot be open (AthFile)
+	* M python/AthFile/impl.py
+	* M python/AmiLib.py
+
+2010-04-12  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-10-12
+	* better handling of mixed-projects tag submission
+	* M python/scripts/tc_submit_tag.py
+
+2010-04-07  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-10-11
+	* forward compat w/ ROOT 5.26
+	* M bin/pyroot.py
+
+2010-03-26  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-10-10
+	* support for external PoolFileCatalog and lists thereof
+	* additional PoolFileCatalog protocols
+	* M python/xmldict.py
+	* M python/PoolFile.py
+
+2010-03-17  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-10-09
+	* more protections
+	* automatically find project-name when release is given
+	* M python/scripts/tc_submit_tag.py
+
+	* tagging PyUtils-00-10-08
+	* automatically find project-name when release is given
+	* M python/scripts/tc_submit_tag.py
+
+2010-03-16  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-10-07
+	* conveniently make -m an alias for -j
+	* M python/scripts/tc_submit_tag.py
+
+	* tagging PyUtils-00-10-06
+	* more hack for ami->athfile converter (infer run-nbr from fname)
+	* M python/AthFile/impl.py
+
+2010-03-15  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-10-05
+	* mockup stream_names from dataType in ami->athfile converter
+	* M python/AthFile/tests.py
+	* M python/AthFile/impl.py
+
+2010-03-12  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-10-04
+	* preliminary support for ami dataset info queries for AthFile
+	* rationalize ami protocol naming
+	* M python/AthFile/impl.py
+	* M python/AthFile/tests.py
+
+	* tagging PyUtils-00-10-03
+	* preliminary support for ami dataset info queries for AthFile
+	* M python/AthFile/impl.py
+	* M python/AthFile/tests.py
+	* M python/AmiLib.py
+
+2010-03-09  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-10-02
+	* adding a general filtering script for pool and bs files
+	* M python/scripts/__init__.py
+	* M python/scripts/merge_files.py
+	* A python/scripts/filter_files.py
+	* M python/AthFile/impl.py
+
+	* tagging PyUtils-00-10-01
+	* fixing bug #64022: handle multiple pfns
+	* M python/PoolFile.py
+
+2010-03-01  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-10-00
+	* tracking update to argparse-1.1
+	* sync pep8 from upstream
+	* M python/acmdlib.py
+	* M bin/pep8.py
+
+2010-02-20  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-09-19
+	* use AthenaPython/athfile_peeker jobo
+	* fix for new stream-name conventions
+	* M python/AthFile/impl.py
+	* M python/PoolFile.py
+
+2010-02-17  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-09-18
+	* ability to parse n evts with athfile
+	* new cmt-new-pkg acmd
+	* amilib improvements
+	* A python/scripts/cmt_newpkg.py
+	* M python/AmiLib.py
+	* M python/scripts/__init__.py
+	* M python/scripts/ath_dump.py
+	* M python/scripts/tc_submit_tag.py
+	* M python/scripts/tc_find_pkg.py
+	* M python/AthFile/__init__.py
+	* M python/AthFile/impl.py
+	* M bin/dump-athfile.py
+
+2010-02-03  Sebastien Binet  <binet@voatlas51.cern.ch>
+
+	* tagging PyUtils-00-09-17
+	* preliminary support for tc-submit-tag
+	* M python/AmiLib.py
+
+2010-02-02  Sebastien Binet  <binet@voatlas51.cern.ch>
+
+	* tagging PyUtils-00-09-15
+	* cleaning up req file
+	* M cmt/requirements
+
+2010-02-02  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-09-14
+	* properly normalize localfs files (symlinks,realpath,...)
+	* M python/AthFile/impl.py
+
+	* tagging PyUtils-00-09-13
+	* adding an argparse-based nested-commands fwk builder
+	* fix nested-commands registration
+	* M bin/acmd.py
+	* M python/acmdlib.py
+
+2010-02-01  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-09-12
+	* adding an argparse-based nested-commands fwk builder
+	* fix nested-commands registration
+	* M python/acmdlib.py
+
+	* tagging PyUtils-00-09-11
+	* adding an argparse-based nested-commands fwk builder
+	* migrating a few commands to acmd-lib
+	* A bin/acmd.py
+	* A python/acmdlib.py
+	* A python/scripts
+	* A python/scripts/__init__.py
+	* A python/scripts/check_file.py
+	* A python/scripts/diff_root_files.py
+	* A python/scripts/ath_dump.py
+	* A python/scripts/merge_files.py
+	* A python/scripts/get_tag_diff.py
+	* A python/scripts/check_reflex.py
+	* A python/scripts/diff_pool_files.py
+	* A python/scripts/tc_submit_tag.py
+	* A python/scripts/check_sg.py
+	* A python/scripts/gen_klass.py
+	* A python/scripts/tc_find_pkg.py
+	* A python/reimport.py
+	* M python/PoolFile.py
+	* M python/Dso.py
+	* M python/AmiLib.py
+	* M cmt/requirements
+
+2010-01-27  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-09-08
+	* make sure to close all TFiles in subprocesses
+	* FIXME: this cleanup code isnt run when SIGTERM is sent
+	* M python/AthFile/impl.py
+	* M python/AthFile/__init__.py
+
+2010-01-26  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-09-07
+	* trying to address bug #61818
+	* reduce the number of TFile.Open
+	* use cache for remote files too
+	* M python/AthFile/impl.py
+
+2010-01-25  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-09-06
+	* trying to address bug #61818
+	* reduce the number of TFile.Open
+	* use cache for remote files too
+	* M python/AthFile/impl.py
+
+2010-01-22  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-09-04
+	* make athfile less verbose
+	* fix environment stripping for the pool_xyz.py wrappers
+	* M python/AthFile/impl.py
+	* M bin/pool_extractFileIdentifier.py
+	* M bin/pool_insertFileToCatalog.py
+
+2010-01-20  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-09-03
+	* adding a simple module to simplify file access and mods
+	* A python/fileutils.py
+
+2010-01-19  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-09-02
+	* use new read/copy-file code from AthenaPython to properly merge files
+	* M python/PoolFile.py
+
+	* tagging PyUtils-00-09-01
+	* adding a unit test for TAG files (bug #60932)
+	* M python/AthFile/tests.py
+
+2010-01-15  Sebastien Binet  <binet@farnsworth>
+
+	* adding a stub of an AMI helper lib
+	* A python/AmiLib.py
+
+2010-01-14  Sebastien Binet  <binet@lxplus312.cern.ch>
+
+	* tagging PyUtils-00-09-00
+	* PyCmt refactorization
+	* D bin/make_pkgbuild.py
+	* D python/pyshell
+	* D python/pyshell/basicshell.py
+	* D python/pyshell/vt100.py
+	* D python/pyshell/shellcmd.py
+	* D python/pyshell/test-pyshell.py
+	* D python/pyshell/__init__.py
+	* D python/pyshell/pyshell_unittest.py
+	* D python/pyshell/utils.py
+	* D python/pyshell/localshell.py
+	* D python/pkgbuild
+	* D python/pkgbuild/__init__.py
+	* D python/pkgbuild/distutils_support.py
+	* D python/pkgbuild/cmmi.py
+	* M python/Helpers.py
+	* M python/WorkAreaLib.py
+	* M python/Decorators.py
+	* M python/PoolFile.py
+	* M python/bwdcompat.py
+	* M python/decorator.py
+	* M python/Cmt.py
+	* M python/AthFile/__init__.py
+	* M python/AthFile/impl.py
+	* M python/Logging.py
+	* M cmt/requirements
+	* M ChangeLog
+	* M bin/build_cmt_pkg_db.py
+	* M bin/gen-typereg-dso.py
+	* M bin/tabnanny-checker.py
+	* M bin/get-tag-diff.py
+	* M bin/pkgco.py
+	* M bin/cmtClients.py
+	* M bin/avn.py
+	* M bin/abootstrap-wkarea.py
+
+2010-01-11  Sebastien Binet  <binet@lxplus308.cern.ch>
+
+	* tagging PyUtils-00-08-72
+	* fixing TAG handling (bug #60932)
+	* M python/AthFile/impl.py
+
+2009-12-17  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-71
+	* added missing af.fname function
+	* M python/AthFile/__init__.py
+	* M python/AthFile/impl.py
+
+	* tagging PyUtils-00-08-70
+	* update merge-poolfiles library
+	* M python/PoolFile.py
+
+	* tagging PyUtils-00-08-69
+	* preemptive check of import lock to prevent deadlock
+	* M python/AthFile/__init__.py
+
+2009-12-14  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-68
+	* nicer handling of invalid DEFAULT_AF_CACHE_FNAME file names
+	* do not crash and burn if md5 module cannot be imported
+	* M python/AthFile/impl.py
+	* M python/path.py
+
+2009-12-11  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-67
+	* fix possible write on closed pipe
+	* typo
+	* M python/AthFile/__init__.py
+	* M python/bwdcompat.py
+
+2009-12-09  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-66
+	* checkreq fix
+	* M cmt/requirements
+
+	* tagging PyUtils-00-08-65
+	* workaround AFS inability to host sockets
+	* M python/AthFile/__init__.py
+	* M python/AthFile/impl.py
+
+2009-12-08  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-64
+	* call prctl(PR_SET_PDEATHSIG, signum) to have the child being
+	  notified when parent process died to prevent any orphaned process
+	  to appear
+	* M python/AthFile/__init__.py
+	* M python/AthFile/impl.py
+
+2009-12-07  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-63
+	* fixing bug #60202 : properly close "temporary" TFiles
+	* M python/AthFile/impl.py
+
+2009-12-05  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-62
+	* fix bug #60131
+	* rename tcSubmitTag
+	* icython fix for cython-0.12
+	* M python/Dso.py
+	* M bin/icython.py
+	* M bin/tcSubmitTag.py
+
+2009-11-29  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-61
+	* extend proxied API of AthFileServer
+	* M python/AthFile/impl.py
+
+2009-11-27  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-60
+	* adding tc-submit-tag script to more easily submit tags to TC2
+	* A bin/tc-submit-tag.py
+	* M cmt/requirements
+	* M python/Cmt.py
+
+	* tagging PyUtils-00-08-59
+	* update RCS keywords (Revision)
+
+2009-11-26  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-58
+	* reorganize and speed-up PyUtils.AthFile module
+	* A python/AthFile/impl.py
+	* M python/AthFile/__init__.py
+	* M python/AthFile/tests.py
+
+2009-11-23  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-56
+	* first stab at fixing bug #59253
+	* M python/AthFile/__init__.py
+
+2009-11-20  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-55
+	* refactorize file-opening/existing methods
+	* *needs* RootUtils-00-00-43
+	* M python/AthFile/__init__.py
+	* M python/RootUtils.py
+	* M cmt/requirements
+
+2009-11-19  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-54
+	* improved tabnanny script and root_compile handling
+	* M bin/tabnanny-checker.py
+	* M python/RootUtils.py
+
+2009-11-16  Sebastien Binet  <binet@farnsworth.localdomain>
+
+	* tagging PyUtils-00-08-53
+	* a faster md5-checksum
+	* M python/AthFile/__init__.py
+	* M python/AthFile/tests.py
+
+	* tagging PyUtils-00-08-52
+	* allow to pick-up the library from LD_LIBRARY_PATH w/o absolute path
+	* M bin/dlldep.py
+
+2009-11-13  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-51
+	* adding md5chk-sum
+	* adding RootUtils module
+	* A python/RootUtils.py
+	* M python/AthFile/__init__.py
+	* M python/AthFile/tests.py
+	* M bin/dump-athfile.py
+
+2009-11-12  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-50
+	* improved support for no-ath-cache building
+	* M python/AthFile/__init__.py
+
+	* tagging PyUtils-00-08-49
+	* handle exceptions when athfile-cache cannot be saved
+	* M python/AthFile/__init__.py
+
+2009-11-09  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-48
+	* improving sqlite-shelve support
+	* migrate athfile to sqlite-shelve
+	* M python/dbsqlite.py
+	* M python/AthFile/__init__.py
+
+2009-11-06  Sebastien Binet  <binet@lxplus306.cern.ch>
+
+	* tagging PyUtils-00-08-47
+	* adding an sqlite3-backed shelve module
+	* A python/dbsqlite.py
+
+2009-11-06  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-46
+	* temporary hack for ROOT bug #57409 (dcache)
+	* M python/AthFile/__init__.py
+
+2009-11-05  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-45
+	* improve abootstrap-wkarea
+	* M bin/abootstrap-wkarea.py
+
+2009-10-30  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-44
+	* provide an avn help message
+	* M bin/avn.py
+
+	* tagging PyUtils-00-08-43
+	* normalized avn CLI (always using @mungtag)
+	* M bin/avn.py
+
+	* tagging PyUtils-00-08-42
+	* improved doc of avn + extended functionality of avn-diff
+	* M bin/avn.py
+
+2009-10-29  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-41
+	* adding a bootstrap script for creating workareas
+	* A bin/abootstrap-wkarea.py
+
+	* cosmetics
+	* M bin/avn.py
+
+	* tagging PyUtils-00-08-40
+	* adding atlas-svn helper script
+	* A bin/avn.py
+	* M cmt/requirements
+
+2009-10-27  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-39
+	* slam an API on top of get-tag-diff
+	* M python/Cmt.py
+	* M bin/get-tag-diff.py
+
+	* tagging PyUtils-00-08-38
+	* new get-tag-diff command
+	* A bin/get-tag-diff.py
+	* A python/bwdcompat.py
+	* M python/Cmt.py
+	* M python/pyshell/localshell.py
+	* M python/pyshell/utils.py
+	* M cmt/requirements
+
+2009-10-26  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-37
+	* re-adding xrootd test for AthFile
+	* bump pep8
+	* M python/AthFile/tests.py
+	* M bin/pep8.py
+
+2009-10-09  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-36
+	* automatically add pool files to PoolFileCatalog.xml to prevent
+	  crashes in AthFile when in presence of empty pool files
+	* update utests
+	* M python/AthFile/__init__.py
+	* M python/AthFile/tests.py
+
+2009-10-07  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-35
+	* fixing bug #56086
+	  extract event type from bs free metadata strings (if any)
+	* added extra bs_metadata entry to dict
+	* M python/AthFile/__init__.py
+
+2009-09-29  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-34
+	* fixing wrong asserts
+	* M python/PoolFile.py
+	* M python/AthFile/__init__.py
+
+2009-09-25  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-33
+	* fixed help msg of checkSG + improved MD5-sum calc for AthFile
+	* M bin/checkSG.py
+	* M python/AthFile/__init__.py
+
+2009-09-24  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-32
+	* relax invariants on the PoolFileCatalog content
+	* M python/PoolFile.py
+
+2009-09-22  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-31
+	* provide an API to disable/enable the athfile (persistent)
+	  caching mechanism
+	* M python/AthFile/__init__.py
+
+	* tagging PyUtils-00-08-30
+	* allow to disable athfile caching mechanism w/
+	  an empty DEFAULT_AF_CACHE_FNAME env. var.
+	* M python/AthFile/__init__.py
+
+2009-09-21  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-29
+	* obo Mous: expand (py)castor api
+	* M python/castor.py
+
+2009-09-14  Sebastien Binet  <binet@lxplus304.cern.ch>
+
+	* tagging PyUtils-00-08-28
+	* adding pep8 lint-like script
+	  http://pypi.python.org/pypi/pep8
+	* A bin/pep8.py
+	* M cmt/requirements
+
+2009-09-11  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-27
+	* fixing file-descriptor leak
+	* M bin/icython.py
+	* M python/AthFile/__init__.py
+	* M python/pkgbuild/__init__.py
+
+2009-09-10  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-26
+	* more macosx fixes
+	* M python/pkgbuild/__init__.py
+	* M python/pkgbuild/distutils_support.py
+
+2009-09-09  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-25
+	* macosx fixups (pkgbuild)
+	* M python/pkgbuild/__init__.py
+
+2009-08-31  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-24
+	* trying to address bug #48271 (os.listdir may raise)
+	* M python/Dso.py
+
+	* tagging PyUtils-00-08-23
+	* trying to address bug #48271 (os.listdir may raise)
+	* M python/Dso.py
+
+2009-08-27  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-22
+	* fixing loading of libraries with missing symbols
+	* M bin/vmem-sz.py
+
+	* tagging PyUtils-00-08-21
+	* adding a suppression list to checkPlugins.py to handle known dups
+	* M bin/checkPlugins.py
+
+2009-08-25  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-20
+	* bump decorator to 3.1.2
+	* M python/decorator.py
+
+	* tagging PyUtils-00-08-19
+	* consolidation of file name handling
+	  (always use PyUtils.AthFile:server.fname)
+	* M python/PoolFile.py
+	* M python/AthFile/__init__.py
+
+	* tagging PyUtils-00-08-18
+	* workaround illegal pkg version introduced by AtlasLogin+projectArea
+	* M python/Cmt.py
+
+	* tagging PyUtils-00-08-17
+	* implement a fallback strategy for when AthFile fails:
+	  run w/ the full environment instead of the slimmed one
+	* workaround LCGCMT-pyxml module which was hidding xml.etree
+	* M python/AthFile/__init__.py
+	* M python/xmldict.py
+
+2009-08-18  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-16
+	* bumping decorator to 3.1.1
+	* made pkgco multiprocessing aware to speed-up check-outs
+	* improved mp_forking decorator
+	* M python/Decorators.py
+	* M python/decorator.py
+	* M bin/pkgco.py
+
+2009-08-13  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-15
+	* fixed failing test command
+	* M test/PyUtils.xml
+
+2009-08-11  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-14
+	* removed debugging printout leftover
+	* M python/AthFile/__init__.py
+
+2009-08-10  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-13
+	* handle race condition on file ${DEFAULT_AF_CACHE_FNAME}
+	* disable PyUtils.AthFile utest as it requires some more runtime karma
+	* M python/AthFile/__init__.py
+	* M test/PyUtils.xml
+
+2009-08-07  Sebastien Binet  <binet@farnsworth>
+
+	* python/AthFile/__init__.py: allow to tweak the name of the default
+	  athfile cache from ${DEFAULT_AF_CACHE_FNAME}
+
+	* tagging PyUtils-00-08-11
+	* adding default filename for AthFile.{load,save}_cache
+	* save the dump-athfile report only once when multiple input files
+	* M python/AthFile/__init__.py
+	* M bin/dump-athfile.py
+
+	* tagging PyUtils-00-08-10
+	* adding a default automatic caching mechanism to AthFile
+	* M python/AthFile/__init__.py
+	* M python/AthFile/tests.py
+	* M bin/dump-athfile.py
+
+	* tagging PyUtils-00-08-09
+	* updating unit-tests files + adding ATN test
+	* M python/AthFile/tests.py
+	* A test/PyUtils.xml
+
+2009-08-06  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-08
+	* graceful handling of corrupted rootmap files
+	* M python/Dso.py
+
+2009-08-05  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-07
+	* add handling of non-root files to af.exists over various protocols
+	* temporarily disable xrootd test (looking for a new ref-file)
+	* M python/AthFile/__init__.py
+	* M python/AthFile/tests.py
+
+2009-08-03  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-06
+	* bumping smem to tip-708dd2e1b91a (from upstream)
+	* adding a md5-sum function for future athfile work
+	* M python/smem.py
+	* M python/AthFile/__init__.py
+
+2009-07-30  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-05
+	* more pkgbuild include-path fixes
+	* improved tabnanny report
+	* M bin/tabnanny-checker.py
+	* M cmt/requirements
+
+2009-07-29  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-04
+	* adding a tabnanny wrapper to run on many CMT projects
+	* A bin/tabnanny-checker.py
+	* M cmt/requirements
+
+2009-07-28  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-03
+	* fixing PyUtils.Cmt:projects_tree regexp
+	* M python/Cmt.py
+
+2009-07-27  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-02
+	* fixing CMT-stderr messages + sanity checks in pkgbuild
+	* M python/pkgbuild/__init__.py
+	* M python/Cmt.py
+
+2009-07-27  Frank Winklmeier  <fwinkl@cern>
+
+	* tagging PyUtils-00-08-01
+	* bin/pkgco.py: Add '-s' option to pkgco.py
+
+2009-07-23  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-08-00
+	* pkgbuild fixes for nicos/distutils (install in pkgroot/$CMTCONFIG)
+	* M python/pkgbuild/__init__.py
+	* M python/pkgbuild/distutils_support.py
+	* M python/pkgbuild/cmmi.py
+
+2009-07-22  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-07-00
+	* new and improved version to slim CMT-environment
+	* M python/Helpers.py
+	* M python/AthFile/__init__.py
+
+2009-07-21  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-06-37
+	* quick fix for new LCGCMT_56b and gcc43 symlinks
+	* M python/Helpers.py
+
+2009-07-16  David Rousseau  <droussea@lxbuild084.cern.ch>
+
+	* tagging PyUtils-00-06-36
+	* python/AthFile/__init__.py : replace isinstance(root_file,
+	ROOT.TFile) by bool(root_file) (Francois Niedercorn)
+	Necessary since root does not return None anymore when retrieving
+	invalid root file
+
+2009-07-13  RD Schaffer  <R.D.Schaffer@cern.ch>
+
+	* tagging PyUtils-00-06-35
+	* python/Helpers.py (restricted_ldenviron): do not add in work
+	area for AtlasProduction and Tier0
+
+2009-07-10  David Rousseau  <droussea@lxbuild084.cern.ch>
+
+	* python/Helpers.py : from wim : fix environment stripping (52926) 
+
+	* python/AthFile/__init__.py : lfn peeking was broken 
+
+2009-07-03  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-06-31
+	* adding Scott's script to get some statistics out of shared libraries
+	* A bin/dso-stats.py
+	* M cmt/requirements
+
+2009-07-02  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-06-30
+	* fix incremental build of pkgbuild
+	* improved remote-exception reporting
+	* M python/Decorators.py
+	* M python/pkgbuild/__init__.py
+
+2009-06-30  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-06-29
+	* improved pkgbuild + vmem-sz output
+	* M python/pkgbuild/__init__.py
+	* M python/pkgbuild/distutils_support.py
+	* M python/pkgbuild/cmmi.py
+	* M cmt/requirements
+	* M bin/vmem-sz.py
+
+2009-06-29  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-06-28
+	* improved dcache support (bug #52444)
+	* slimmed down used disk-space for pkgbuilds + distcc hack
+	* M python/pkgbuild/__init__.py
+	* M python/AthFile/__init__.py
+
+2009-06-24  Sebastien Binet  <binet@lxplus316.cern.ch>
+
+	* tagging PyUtils-00-06-27
+	* log the sub-athena process and keep it if failure
+	* M python/AthFile/__init__.py
+
+	* tagging PyUtils-00-06-26
+	* fixing bug #52176: call FEF.check instead of FEF.check_tree
+	  so we're not too picky about BS input
+	* M python/AthFile/__init__.py
+
+2009-06-19  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-06-25
+	* adding pkgbuild + fixing LFN issue
+	* A python/pkgbuild
+	* A bin/make_pkgbuild.py
+	* M python/AthFile/__init__.py
+	* M cmt/requirements
+
+2009-06-18  David Rousseau  <droussea@lxbuild084.cern.ch>
+
+	* tagging PyUtils-00-06-24
+	* python/PoolFile.py: typo in tag inspection
+
+2009-06-16  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-06-23
+	* don't mistake crashing athena jobs w/ empty pool files
+	* more checks for bs+rfio
+	* M python/AthFile/__init__.py
+	* M python/AthFile/tests.py
+
+	* tagging PyUtils-00-06-22
+	* suppress ROOT::TFile::Init error messages
+	* M python/AthFile/__init__.py
+
+	* tagging PyUtils-00-06-21
+	* be less picky about URIs
+	* allow '/castor/foo.pool' paths
+	* M python/AthFile/__init__.py
+	* M python/AthFile/tests.py
+
+2009-06-12  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-06-20
+	* support for new name of TAG's TTree
+	* added a script to launch a cython interpreter
+	* A bin/icython.py
+	* M python/PoolFile.py
+
+2009-06-08  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-06-19
+	* fixed (refactorization) regression
+	* M bin/build_cmt_pkg_db.py
+
+	* tagging PyUtils-00-06-18
+	* improved AthFile support for dcache/root
+	* M python/AthFile/__init__.py
+	* M python/AthFile/tests.py
+
+2009-05-30  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-06-17
+	* more dcache/root fixes.
+	* M python/AthFile/__init__.py
+	* M python/AthFile/tests.py
+
+2009-05-29  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-06-16
+	* cosmetics: remove ROOT messages of missing dicts in AthFile.exists
+	* M python/AthFile/__init__.py
+
+	* tagging PyUtils-00-06-15
+	* fix dcache handling in AthFile.exists
+	* added merge-poolfiles script
+	* M python/AthFile/__init__.py
+	* M python/PoolFile.py
+	* A bin/merge-poolfiles.py
+	* M cmt/requirements
+
+	* tagging PyUtils-00-06-14
+	* better handling of various protocols for AthFile.exists
+	* M python/AthFile/__init__.py
+
+2009-05-27  Frank Winklmeier  <fwinkl@cern>
+	
+	* tagging PyUtils-00-06-13	
+	* A bin/pkgco.py: Moved from Tools/Scripts
+	* Remove trivial Cmt.findPkgByName wrapper
+
+2009-05-27  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-06-12
+	* improved docs
+	* M python/AthFile/__init__.py
+
+	* tagging PyUtils-00-06-11
+	* improved docs
+	* allow to pick-up AthFile.server caches from InstallArea
+	* M python/AthFile/__init__.py
+	* M python/Cmt.py
+	* M python/WorkAreaLib.py
+
+2009-05-26  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-06-10
+	* cosmetics in Cmt:findPkgByName + added CmtWrapper.project_dag
+	  and GUID peeking
+	* move all scripts from 'share' to 'bin'
+	* M python/Cmt.py
+	* M python/AthFile/__init__.py
+	* M python/AthFile/tests.py
+	* M bin/dump-athfile.py
+	* M cmt/requirements
+	* D share/*
+	* D share
+
+2009-05-26  Frank Winklmeier <fwinkl@cern>
+  * python/Cmt.py: Add helper to find package version in release
+
+2009-05-25  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-06-09
+	* python/AthFile/__init__.py: fixups for json
+	* python/WorkAreaLib.py: updating ignore-dir-list for svn directories
+
+2009-05-19  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-06-08
+	* python/AthFile/__init__.py: adding JSON,py-ASCII and pickle backends
+	  to the FileServer.{load,save}_cache mechanism
+
+	* tagging PyUtils-00-06-07
+	* use ChapPy instead of AthApi (prevents spurious crashes)
+	* M python/AthFile/__init__.py
+	* M python/AthFile/tests.py
+
+2009-05-18  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-06-06
+	* cosmetics
+	* M python/Logging.py
+
+	* tagging PyUtils-00-06-05
+	* retrofitted PoolFile.extract_xyz to use AthFile
+	* more tests + more fixes + nice handling of TAG files
+	* capture Logging from AthenaCommon to prevent circular deps
+	* A python/Logging.py
+	* M python/AthFile/__init__.py
+	* M python/AthFile/tests.py
+	* M python/PoolFile.py
+	* M bin/dump-athfile.py
+
+2009-05-15  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-06-04
+	* python/PoolFile.py: improved checks in PoolFile.extract_items
+	* python/AthFile/__init__.py: improved docs
+	* python/AthFile/tests.py: more tests
+
+2009-05-14  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-06-03
+	* fixup for BS files which do not have metadata
+	* M bin/dump-athfile.py
+
+	* tagging PyUtils-00-06-02
+	* tweaking build order
+	* M cmt/requirements
+
+	* tagging PyUtils-00-06-01
+	* cosmetic changes
+	* M bin/dump-athfile.py
+	* M python/AthFile/__init__.py
+	* M python/AthFile/tests.py
+
+	* tagging PyUtils-00-06-00
+	* reimplementation of AthFile based on PyAthena
+	* sanitize loggers' usage
+	* A bin/dump-athfile.py
+	* M bin/setupWorkArea.py
+	* M cmt/requirements
+	* R python/AthFile.py
+	* M python/Cmt.py
+	* M python/Helpers.py
+	* M python/WorkAreaLib.py
+	* A python/AthFile/__init__.py
+	* A python/AthFile/tests.py
+	* M share/cmtClients.py
+	
+
+2009-05-11  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-05-02
+	* better handling of digitization POOL files
+	* M python/AthFile.py
+
+	* tagging PyUtils-00-05-01
+	* adding 'smem' from http://www.selenic.com/smem/
+	* fixing regression in AthFile in case of empty files
+	* fixup in PoolFile
+	* adding context-protocol to Root-Shutup
+	* A python/smem.py
+	* M python/AthFile.py
+	* M python/Helpers.py
+	* M python/PoolFile.py
+
+2009-04-28  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-05-00
+	* implement a 'lightweight' file-informations mechanism
+	* M python/AthFile.py
+	* M python/PoolFile.py
+
+2009-04-27  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-04-09
+	* handling DataHeader_p4
+	* M python/PoolFile.py
+
+2009-04-22  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-04-08
+	* fixing CMT-pkg-version regexp
+	* M python/Cmt.py
+
+2009-04-14  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-04-07
+	* more robust ld-environment slimming (do not rely on CMT)
+	* M python/Helpers.py
+	* M python/Cmt.py
+	* M python/pyshell/localshell.py
+	* M python/PoolFile.py
+	
+2009-04-06  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-04-06
+	* fixing bug 48597: do not remove elements from LD_LIBRARY_PATH
+	  if they start with something from LCGCMT
+	* M python/Helpers.py
+	* M cmt/requirements
+
+2009-03-31  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-04-05
+	* improve AthFile infos retrieval (lazyness is good): now the whole
+	  file (and all its events) is only crawled through when and only when
+	  the 'infos' attribute is asked for.
+	* support of env. variables and tilde in fnames for AthFile
+	* M python/AthFile.py
+
+	* tagging PyUtils-00-04-04
+	* more descriptive error in case of empty POOL files
+	* fallback solution in case temp-file could not be properly created
+	* M python/PoolFile.py
+	* M python/Helpers.py
+
+2009-03-27  Sebastien Binet  <binet@lxplus232.cern.ch>
+
+	* tagging PyUtils-00-04-03
+	* fixing bug 48611: also make sure the properties are correct...
+	* M python/AthFile.py
+
+	* tagging PyUtils-00-04-02
+	* fixing bug 48611: catch runtime errors flagging corrupted BS-files
+	* M python/AthFile.py
+
+2009-03-21  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-04-01
+	* adding 'pool_extractFileIdentifier' for the same reason than 
+	  'pool_insertFileToCatalog'
+	* use Helpers.restricted_ldenviron
+	* improvements for pyshell
+	* A bin/pool_extractFileIdentifier.py
+	* M bin/pool_insertFileToCatalog.py
+	* M cmt/requirements
+	* M python/pyshell/__init__.py
+	* M python/pyshell/basicshell.py
+	* M python/pyshell/localshell.py
+
+2009-03-19  Sebastien Binet  <binet@lxplus240.cern.ch>
+
+	* tagging PyUtils-00-04-00
+	* adding pyshell (stolen from AskShell)
+	* improving pycmt logging
+	* M bin/setupWorkArea.py
+	* M cmt/requirements
+	* M python/Cmt.py
+	* A python/pyshell/__init__.py
+	* A python/pyshell/basicshell.py
+	* A python/pyshell/localshell.py
+	* A python/pyshell/pyshell_unittest.py
+	* A python/pyshell/shellcmd.py
+	* A python/pyshell/test-pyshell.py
+	* A python/pyshell/utils.py
+	* A python/pyshell/vt100.py
+
+2009-03-11  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-03-64
+	* better error reporting + workaround infamous CMT bugs
+	* M python/WorkAreaLib.py
+	* M python/PoolFile.py
+
+2009-03-06  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-03-63
+	* adding support for DH_p1 in extract_items
+	* M python/PoolFile.py
+
+2009-02-20  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-03-62
+	* fix-ups in dict-loading (preserve LD_LIBRARY_PATH ordering)
+	* new feature for vmem-sz
+	* M python/Dso.py
+	* M bin/vmem-sz.py
+
+2009-02-18  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-03-61
+	* more dict-loading fixes
+	* M python/Dso.py
+
+2009-02-16  Sebastien Binet  <binet@farnsworth>
+
+	* fixing typo
+	* M python/Cmt.py
+
+	* tagging PyUtils-00-03-60
+	* adding a script to generate a master type-registry working around
+	  various rootmap and reflex issues
+	* A bin/gen-typereg-dso.py
+	* M python/Dso.py
+	* M cmt/requirements
+
+	* tagging PyUtils-00-03-59
+	* bump to upstream decorator-3.0.1
+	* M python/decorator.py
+
+2009-02-09  Frank Winklmeier  <fwinkl@cern>
+	* tagging PyUtils-00-03-58
+	* A bin/dlldep.py: Script to visualize shared library dependencies
+
+2009-02-09  Sebastien Binet  <binet@lxplus250.cern.ch>
+
+	* tagging PyUtils-00-03-57
+	* working around mods in ROOT-5.22
+	* better error reporting in 'forking'
+	* M python/PoolFile.py
+	* M python/Decorators.py
+
+2009-02-02  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-03-56
+	* tentative TAG files support for PyUtils.PoolFile:extract_stream_names
+	* M python/PoolFile.py
+
+2009-01-27  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-03-55
+	* fixing up kb computation (were in fact computed as kib)
+	* M python/PoolFile.py
+
+2009-01-26  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-03-54
+	* adding a script to extract libs vmem sizes
+	* A bin/vmem-sz.py
+	* M cmt/requirements
+
+2009-01-23  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-03-53
+	* renaming file_type into ftype
+	* M python/AthFile.py
+
+	* tagging PyUtils-00-03-52
+	* adding PyUtils.AthFile:file_type to retrieve the type of a file
+	  (bs or pool)
+	* M python/AthFile.py
+
+	* tagging PyUtils-00-03-51
+	* fine tuning PyUtils.PoolFile:extract_stream_names
+	* M python/PoolFile.py
+
+	* tagging PyUtils-00-03-50
+	* adding PyUtils.PoolFile:extract_stream_names
+	* M python/PoolFile.py
+
+2009-01-22  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-03-49
+	* adding PyUtils.AthFile:exists method
+	* M python/AthFile.py
+
+2009-01-21  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-03-48
+	* more ROOT-5.22 fixes
+	* new little utils for multiprocessing
+	* A python/MpUtils.py
+	* M bin/checkTP.py
+
+2009-01-20  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-03-47
+	* adding an object-oriented way of manipulating path
+	  http://wiki.python.org/moin/PathModule
+	* A python/path.py
+
+2009-01-19  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-03-46
+	* more protections against phony PoolFileCatalog.xml files
+	* M python/PoolFile.py
+
+2009-01-16  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-03-45
+	* more fix for ROOT-5.22
+	* M python/PoolFile.py
+	* M python/Helpers.py
+
+	* tagging PyUtils-00-03-44
+	* fix for ROOT-5.22 (don't use TFile.SetReadStreamerInfo)
+	* added a contextmanager to replace TFile.SetReadStreamerInfo
+	* added an async decorator to make functions asynchronous
+	* M python/AthFile.py
+	* M python/Decorators.py
+	* M python/Helpers.py
+	* M python/PoolFile.py
+	* M python/decorator.py (bumped to version 3.0)
+
+2009-01-14  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-03-43
+	* fix-up for new CMT version's (spurious) printouts
+	* handle empty and corrupted POOL files (AthFile)
+	* M python/Cmt.py
+	* M python/AthFile.py
+
+2009-01-08  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-03-42
+	* python/Dso.py (_is_rootcint_dict): new function to remove rootcint
+	  libraries from the rootmap entries
+
+2008-12-17  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-03-41
+	* make PyUtils.AthFile.fopen handle multiple input files
+	* M python/AthFile.py
+
+2008-12-16  scott s snyder  <snyder@bnl.gov>
+
+	* tagging PyUtils-00-03-40
+	* python/coverage.py: (new)
+	* doc/mainpage.h: Add it.
+
+2008-12-08  Sebastien Binet  <binet@lxplus217.cern.ch>
+
+	* tagging PyUtils-00-03-39
+	* fixing typo in concrete AlgTool skeleton generation
+	* M bin/gen_klass.py
+
+2008-12-03  Sebastien Binet <binet@farnsworth>
+
+	* tagging PyUtils-00-03-38
+	* more protections against corrupted PoolFileCatalog.xml files
+	* M python/PoolFile.py
+
+2008-11-28  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-37
+	* quick hack to allow checkFile, checkSG and loadKeyStoreFromPoolFile
+	  to work despite the lack of a PoolFileCatalog.xml file
+	* python/PoolFile.py (PoolFileCatalog.pfn)
+
+2008-11-26  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-36
+	* monkey-patch eformat.istream to read data on castor
+	* M python/AthFile.py
+
+2008-11-25  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-35
+	* support for TAGs (feature request #43922)
+	* python/PoolFile.py (extract_streams_from_tag)
+
+2008-11-24  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-34
+	* support for beam-type and FileID
+	* M python/AthFile.py
+	* M python/PoolFile.py
+
+2008-11-18  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-33
+	* make the PoolFile and friends aware of the PoolFileCatalog
+	* A python/xmldict.py
+	* M python/PoolFile.py
+
+2008-11-17  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-32
+	* support of extraction of items from the metadata tree
+	* M python/PoolFile.py
+
+2008-10-23  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-31
+	* support for new DataHeader{,Element}_p3 version
+	* M python/PoolFile.py
+
+2008-10-21  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-30
+	* forward compat. with LCG-55 and new rootmap format
+	* M python/Dso.py
+
+2008-10-20  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-29
+	* python/AthFile.py: cosmetics
+	* updating gen_klass to use AthenaBaseComps classes
+	* M bin/gen_klass.py
+
+2008-10-17  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-28
+	* improved infos gathering for AthFile (run-type+stream-tags)
+	* M python/AthFile.py
+
+2008-10-16  Sebastien Binet  <binet@lblbox>
+
+	* small performance improvement
+	* M python/AthFile.py
+
+	* tagging PyUtils-00-03-27
+	* adding AthFile, an abstraction over athena files (POOL, BS)
+	* A python/AthFile.py
+	* adding bindings to libshift (via ctypes)
+	* A python/_rfio.py
+	* A python/rfio.py
+	* M python/castor.py
+	* de-SEALing checkTP.py
+	* M bin/checkTP.py
+
+2008-09-29  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-26
+	* adding a simple script to compare configurations
+	* A bin/diffConfigs.py
+
+2008-08-29  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-25
+	* use multiprocessing to speed-up checkout of packages
+	* M cmt/requirements
+	* M share/cmtClients.py
+
+2008-08-15  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-24
+	* adding a faster version of pool_insertFileToCatalog
+	* A bin/pool_insertFileToCatalog.py
+	* A cmt/requirements
+
+2008-08-13  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-23
+	* fixing typo introduced from refactorization
+	* M python/Cmt.py
+
+2008-08-07  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-22
+	* adding support for saving checkFile reports into CSV files
+	* M python/PoolFile.py
+
+2008-07-25  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-21
+	* adding a few more tools:
+	    - merge_join
+	    - pshell (to save/restore the complete state of a python session)
+	* A python/merge_join.py
+	* A python/pshell.py
+
+2008-07-01  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-20
+	* proper handling of top-level branches with no sub-branch
+	* M python/PoolFile.py
+
+	* tagging PyUtils-00-03-19
+	* protection against super compressed branches (memsize==0)
+	* M python/PoolFile.py
+
+2008-06-27  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-18
+	* fixing broken import from RootUtils' refactorization
+	* M share/magnifyPoolFile.py
+
+2008-06-24  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-17
+	* better reporting of FAST_MODE
+	* M python/PoolFile.py
+
+2008-06-23  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-16
+	* add a fast mode to checkFile to by-pass memory-size inspection
+	* M share/checkFile.py
+	* M python/PoolFile.py
+
+2008-06-19  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-15
+	* disable the loading of dicts upon TFile::Open for extract_items too
+	  BUT only when forked (we don't want to mess around with global state)
+	* M python/PoolFile.py
+
+2008-06-18  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-14
+	* disable the loading of dicts upon TFile::Open
+	* M python/PoolFile.py
+
+2008-06-17  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-13
+	* more complete builder of CMT packages' repository
+	* M bin/build_cmt_pkg_db.py
+	* M cmt/requirements
+	* M python/Cmt.py
+
+	* tagging PyUtils-00-03-12
+	* first stab at a repository of CMT packages
+	* A bin/build_cmt_pkg_db.py
+	* M bin/getTagDiff.py
+	* M python/Cmt.py
+
+2008-05-15  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-11
+	* fixing missing argument to gen_klass.gen_pyfiles
+	* M bin/gen_klass.py
+
+2008-05-14  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-10
+	* adding generation of stubs for PyAthena components
+	* M bin/gen_klass.py
+
+2008-05-01  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-09
+	* helper script to generate various C++ classes from template files
+	* A bin/gen_klass.py
+
+	* tagging PyUtils-00-03-08
+	* new script to parse a logfile of a job run with NameAuditor
+	  and extract the callgraph sequence of a stage (ini/exe/fin)
+	* A bin/print_auditor_callgraph.py
+	* M cmt/requirements
+
+	* tagging PyUtils-00-03-07
+	* new script to dump the (transient) content of a POOL file
+	* A bin/checkSG.py
+	* M cmt/requirements
+
+	* tagging PyUtils-00-03-06
+	* control verbosity of extract_items
+	* M python/PoolFile.py
+
+2008-04-30  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-05
+	* new forking decorator
+	* M python/Decorators.py
+	* M python/PoolFile.py
+
+	* tagging PyUtils-00-03-04
+	* adding a helper method to extract the ItemList of a POOL file based
+	  on the DataHeader_pX content
+	* M python/PoolFile.py
+
+2008-04-08  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-03
+	* fixing TRFIOFile handle leaks by explicitly closing the TFiles
+	* M python/PoolFile.py
+
+2008-03-24  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-02
+	* added support for 'pcache' nightlies
+	* M bin/getTagDiff.py
+
+2008-03-18  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-01
+	* optimize memoize decorator
+	* M python/Decorators.py
+
+2008-03-17  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-03-00
+	* adding decorators 'library'
+	* A python/Decorators.py
+	* A python/decorator.py
+
+2008-03-06  RD Schaffer  <R.D.Schaffer@cern.ch>
+
+	* tagging PyUtils-00-02-01
+	* python/PoolFile.py (PoolFile.__processFile): labelled meta
+	branches as branches rather than trees - improves checkfile
+	printout.
+
+2008-03-06  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-02-00
+	* refactorize setupWorkArea.py (split into Lib/Exe)
+	* M bin/setupWorkArea.py
+	* M python/Cmt.py
+	* A python/WorkAreaLib.py
+
+2008-02-23  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-01-02
+	* bin/getTagDiff.py: handle devval nightlies (thx to David Strom)
+
+2008-02-13  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-01-01
+	* adding support for AtlasPoint1Runtime package
+	* M bin/setupWorkArea.py
+
+2008-02-09  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-01-00
+	* migrating python scripts from Tools/Scripts
+	* fixing a bug in setupWorkArea.py
+	* A bin/checkTP.py
+	* A bin/checkTag.py
+	* A bin/getTagDiff.py
+	* A bin/pyroot.py
+	* A bin/setupWorkArea.py
+	* M cmt/requirements
+
+2008-01-22  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-00-30
+	* adding a simple minded python library to read content of CASTOR
+	* A python/castor.py
+
+2007-11-16  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-00-29
+	* python/PoolFile.py : re-enabled auto-loading of dicts
+
+2007-11-06  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-00-28
+	* python/PoolFile.py (retrieveBranchInfos): removed some debug printout
+
+2007-10-25  RD Schaffer  <R.D.Schaffer@cern.ch>
+
+	* tagging PyUtils-00-00-27
+	* python/PoolFile.py (PoolOpts.isData): added extra field for
+	missing zip info
+
+2007-10-15  Sebastien Binet  <binet@lxplus212.cern.ch>
+
+	* tagging PyUtils-00-00-26
+	* python/PoolFile.py: more informative traceback when file could not be opened
+
+2007-10-12  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-00-25
+	* python/PoolFile.py: cosmetic fix
+
+	* tagging PyUtils-00-00-24
+	* python/Cmt.py: improved API of Cmt.py.
+
+	* tagging PyUtils-00-00-23
+	* speed-up checkFile processing (do not load dicts.)
+	* improved diffPoolFile
+	* M python/PoolFile.py	 
+	* M share/diffPoolFiles.py
+	* M python/Helpers.py
+
+2007-10-11  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-00-22
+	* input file to checkFile can be now either a POOL file (d'oh!) or a
+	  previous summary report shelve file
+	* M python/PoolFile.py
+
+2007-09-07  RD Schaffer  <R.D.Schaffer@cern.ch>
+
+	* tagging PyUtils-00-00-21
+	* python/PoolFile.py (PoolFile.detailedDump): removed header check
+	to print out metadata tree
+
+2007-08-20  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-00-20
+	* fixing ZeroDivisionError (infact modulo 0)
+	* M share/magnifyPoolFile.py
+
+2007-08-10  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-00-19
+	* python/PoolFile.py: adding a 'save' method to store results of a
+	  checkFile "run"
+
+2007-08-08  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-00-18
+	* python/PoolFile.py: fixing memory size report for DataHeaders
+
+	* tagging PyUtils-00-00-17
+	* python/PoolFile.py: better handling of opening POOL files
+
+2007-07-17  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-00-16
+	* python/PoolFile.py: small fix to display container name in case the
+	  POOL file contains trees
+
+2007-07-10  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-00-15
+	* share/checkFile.py: allow wildcards in filename argument
+
+2007-07-01  Sebastien Binet  <binet@lblbox.dyndns.cern.ch>
+
+	* tagging PyUtils-00-00-14
+	* python/PoolFile.py: mods to be MetaData aware: any tree/branch which 
+	  does not begin with "##" and is not a DataHeader is handled as an
+	  interesting tree/branch (ie: it will be processed)
+
+2007-06-14  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-00-13
+	* added documentation
+	* A doc/mainpage.h
+
+2007-06-03  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-00-12
+	* python/PoolFile.py: factorised the code to decode tree names
+
+2007-05-23  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-00-11
+	* share/magnifyPoolFile.py: more checks to validate input parameters
+	
+	* tagging PyUtils-00-00-10
+	* share/magnifyPoolFile.py: brute force hack to workaround shortcomings
+	  of ROOT TFile size reports
+
+2007-05-22  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-00-09
+	* python/PoolFile.py: first iteration for better T/P v2 support
+	* share/checkFile.py: added option to choose sorting function 
+	  (mem/zip/name)
+
+2007-05-02  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-00-08
+	* share/checkPlugins.py: adding a switch to dump the content of the
+	  complete repository of dsomap/rootmap (entries + libs)
+
+2007-04-27  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-00-07
+	* improved checkPlugins.py and Dso.py
+
+	* tagging PyUtils-00-00-06
+	* added a script to build (and inspect) a global repository of 'dsomap'
+	  files.
+	* added a script to show package clients (and possibly check-out them)
+
+2007-04-17  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-00-05
+	* python/PoolFile.py: better handling of compressed TBaskets.
+
+2007-03-17  Sebastien Binet  <binet@lxplus210.cern.ch>
+
+	* tagging PyUtils-00-00-04
+	* python/PoolFile.py: fixed regression on duplicate keys
+
+2007-03-16  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-00-03
+	* added a small diff utility for POOL files
+	* A share/diffPoolFiles.py
+
+2007-03-16  RD Schaffer  <R.D.Schaffer@cern.ch>
+
+	* tagging PyUtils-00-00-02
+	* python/PoolFile.py (PoolFile.retrieveBranchInfos): fix mem size
+	for branches
+
+2007-03-14  Sebastien Binet  <binet@lblbox>
+
+	* tagging PyUtils-00-00-01
+	* first import
+
