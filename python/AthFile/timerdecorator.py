@@ -40,15 +40,16 @@ def timelimit(timeout):
                 def run(self):
                     try:
                         self.result = function(*args, **kw)
-                    except:
+                    except BaseException:
                         self.error = sys.exc_info()[0]
             
             c = Calculator()
             c.start()
             if _run_from_valgrind():
                 # don't set any timeout under valgrind...
-                timeout = None
-            c.join(timeout)
+                c.join()
+            else:
+                c.join(timeout)
             if c.isAlive():
                 raise TimeoutError
             if c.error:
