@@ -18,6 +18,8 @@ _suppression_dct = {
                'libCore.so',
                'liblcg_PyCoolDict.so',
                'libSTLAddRflx.so'),
+    'vector<vector<double> >': ('libMathCore.so',
+                                'libAtlasSTLAddReflexDict.so'),
     }
 
 def printDb( db, detailedDump = False ):
