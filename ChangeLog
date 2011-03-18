@@ -1,3 +1,10 @@
+2011-03-18  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-61
+	* fixing bug#79622 - ignore dups for vector<vector<double>> from
+	  MathCore and AtlasSTLAddReflexDict
+	* M bin/checkPlugins.py
+
 2011-03-16  Sebastien Binet  <sebastien.binet@cern.ch>
 
 	* tagging PyUtils-00-10-60
