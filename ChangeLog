@@ -1,3 +1,11 @@
+2011-03-28  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-62
+	* tentative fix for bug #79926: if the timeout is reached, catch
+  	  and carry on (HeavyIon jobs tend to have gazillions of entries
+	  which make the athfile-infos.ascii huge-ish and slow to read)
+	* M python/AthFile/impl.py
+
 2011-03-18  Sebastien Binet  <sebastien.binet@cern.ch>
 
 	* tagging PyUtils-00-10-61
