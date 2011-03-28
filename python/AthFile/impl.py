@@ -19,7 +19,7 @@ mp = multiprocessing
 
 import PyUtils.Helpers as H
 from PyUtils.Helpers    import ShutUp
-from .timerdecorator import timelimit
+from .timerdecorator import timelimit, TimeoutError
 
 # -----------------------------------------------------------------------------
 # properly setup tempfile.gettempdir() to prevent from creating
@@ -614,8 +614,11 @@ class AthFileServer(object):
         if (os.path.exists(fname) and
             os.access(fname, os.R_OK)):
             msg.info('loading cache from [%s]...', fname)
-            self.load_cache(fname)
-            msg.info('loading cache from [%s]... [done]', fname)
+            try:
+                self.load_cache(fname)
+                msg.info('loading cache from [%s]... [done]', fname)
+            except TimeoutError:
+                msg.info('loading cache timed out!')
         return
 
     def disable_pers_cache(self):
