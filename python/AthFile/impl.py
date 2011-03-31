@@ -371,6 +371,10 @@ class AthFileServer(object):
         if 'ATHENA_PROC_NUMBER' in os.environ:
             os.unsetenv('ATHENA_PROC_NUMBER')
             
+        # prevent from running athena in interactive mode (and freeze)
+        if 'PYTHONINSPECT' in os.environ:
+            os.unsetenv('PYTHONINSPECT')
+            
         # instantiate a "request handler"
         self._peeker = FilePeeker(self)
 
