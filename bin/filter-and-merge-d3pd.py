@@ -115,6 +115,7 @@ def apply_filters(branches, patterns):
     from fnmatch import fnmatch
     from collections import defaultdict
     filtered = defaultdict(list)
+    matched_patterns = []
     for br in branches:
         for p in patterns:
             if p == '':
@@ -129,6 +130,12 @@ def apply_filters(branches, patterns):
                 p = p[1:]
             if fnmatch(br, p):
                 filtered[br].append(op)
+                matched_patterns.append(p)
+    for p in patterns:
+        if not (p in matched_patterns):
+            print '::: warning: pattern [%s] could not be matched against any branch' % p
+            pass
+        pass
     filtered = dict(filtered)
     return sorted([k for k,v in filtered.iteritems() if v[-1] == '+'])
 
@@ -197,9 +204,8 @@ def merge_all_trees(fnames, tree_name, memory, sfo,
 
             pass # loop over branches
         del tree
-        if idx>0:
-            f.Close()
-            del f
+        f.Close()
+        del f
         pass # loop over trees
 
     while 1: # recursive optimization
@@ -374,9 +380,8 @@ def merge_all_trees(fnames, tree_name, memory, sfo,
                 pass # entry accepted
             pass # loop over entries
         del tree
-        if idx>0:
-            f.Close()
-            del f
+        f.Close()
+        del f
         pass # loop over input trees
     print "::: processing [%i] trees... [done]" % (len(fnames,))
 
@@ -388,6 +393,7 @@ def merge_all_trees(fnames, tree_name, memory, sfo,
     fout = new_tree.GetCurrentFile()
     fout.Write()
     fout.Close()
+    del fout
 
     return
 
