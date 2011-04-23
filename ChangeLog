@@ -1,3 +1,9 @@
+2011-04-23  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-65
+	* obo Peter vG: display buffer object lengths for each branch
+	* M python/PoolFile.py
+
 2011-04-14  Sebastien Binet  <sebastien.binet@cern.ch>
 
 	* tagging PyUtils-00-10-64
