@@ -418,9 +418,15 @@ class PoolOpts(object):
     pass # class PoolOpts
 
 def _get_total_size (branch):
-    if PoolOpts.FAST_MODE:
-        return -1.
-    return branch.GetTotalSize()
+   if PoolOpts.FAST_MODE:
+       return -1.
+   return branch.GetTotalSize()
+   brSize = 0
+   branch.LoadBaskets()
+   for bnum in range(0, branch.GetWriteBasket()):
+       basket = branch.GetBasket(bnum)
+       brSize += basket.GetObjlen() - 8
+   return brSize
 
 def retrieveBranchInfos( branch, poolRecord, ident = "" ):
     fmt = "%s %3i %8.3f %8.3f %8.3f %s"
