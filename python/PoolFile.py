@@ -521,7 +521,7 @@ class PoolFile(object):
     ROOT 'API'.
     """
     
-    def __init__(self, fileName):
+    def __init__(self, fileName, verbose=True):
         object.__init__(self)
 
         self._fileInfos = None
@@ -530,6 +530,7 @@ class PoolFile(object):
                                      nEntries = 0,
                                      dirType = "T")
         self.data       = []
+        self.verbose = verbose
 
         # get the "final" file name (handles all kind of protocols)
         try:
@@ -542,9 +543,11 @@ class PoolFile(object):
         self.poolFile = None
         dbFileName = whichdb.whichdb( fileName )
         if not dbFileName in ( None, '' ):
-            print "## opening file [%s]..." % str(fileName)
+            if self.verbose==True:
+                print "## opening file [%s]..." % str(fileName)
             db = shelve.open( fileName, 'r' )
-            print "## opening file [OK]"
+            if self.verbose==True:
+                print "## opening file [OK]"
             report = db['report']
             self._fileInfos = report['fileInfos']
             self.dataHeader = report['dataHeader']
@@ -553,9 +556,11 @@ class PoolFile(object):
             import PyUtils.Helpers as _H
             projects = 'AtlasCore' if PoolOpts.FAST_MODE else None
             with _H.restricted_ldenviron (projects=projects):
-                print "## opening file [%s]..." % str(fileName)
+                if self.verbose==True:
+                    print "## opening file [%s]..." % str(fileName)
                 self.__openPoolFile( fileName )
-                print "## opening file [OK]"
+                if self.verbose==True:
+                    print "## opening file [OK]"
                 self.__processFile()
             
         return
@@ -563,10 +568,12 @@ class PoolFile(object):
     def __openPoolFile(self, fileName):
         # hack to prevent ROOT from loading graphic libraries and hence bother
         # our fellow Mac users
-        print "## importing ROOT..."
+        if self.verbose==True:
+            print "## importing ROOT..."
         import PyUtils.RootUtils as ru
         ROOT = ru.import_root()
-        print "## importing ROOT... [DONE]"
+        if self.verbose==True:
+            print "## importing ROOT... [DONE]"
         # prevent ROOT from being too verbose
         rootMsg = ShutUp()
         rootMsg.mute()
@@ -701,7 +708,8 @@ class PoolFile(object):
 
     
     def checkFile(self, sorting = PoolRecord.Sorter.DiskSize):
-        print self.fileInfos()
+        if self.verbose==True:
+            print self.fileInfos()
 
         ## sorting data
         data = self.data
@@ -716,57 +724,59 @@ class PoolFile(object):
 
         totMemSize  = _get_val(self.dataHeader.memSize, dflt=0.)
         totDiskSize = self.dataHeader.diskSize
-        print ""
-        print "="*80
-        print PoolOpts.HDR_FORMAT % ( "Mem Size",
-                                      "Disk Size",
-                                      "Size/Evt",
-                                      "MissZip/Mem",
-                                      "items",
-                                      "(X) Container Name (X=Tree|Branch)" )
-        print "="*80
+        
         def _safe_div(num,den):
             if float(den) == 0.:
                 return 0.
-            return num/den
-        
-        print PoolOpts.ROW_FORMAT % (
-            _get_val (self.dataHeader.memSize),
-            self.dataHeader.diskSize,
-            _safe_div(self.dataHeader.diskSize,float(self.dataHeader.nEntries)),
-            _get_val (_safe_div(self.dataHeader.memSizeNoZip,
-                                self.dataHeader.memSize)),
-            self.dataHeader.nEntries,
-            "("+self.dataHeader.dirType+") "+self.dataHeader.name
-            )
-        print "-"*80
+            return num/den   
+                 
+        if self.verbose==True:
+            print ""
+            print "="*80
+            print PoolOpts.HDR_FORMAT % ( "Mem Size", "Disk Size","Size/Evt",
+                                          "MissZip/Mem","items",
+                                          "(X) Container Name (X=Tree|Branch)" )
+            print "="*80
+            
+            print PoolOpts.ROW_FORMAT % (
+                _get_val (self.dataHeader.memSize),
+                self.dataHeader.diskSize,
+                _safe_div(self.dataHeader.diskSize,float(self.dataHeader.nEntries)),
+                _get_val (_safe_div(self.dataHeader.memSizeNoZip,
+                                    self.dataHeader.memSize)),
+                self.dataHeader.nEntries,
+                "("+self.dataHeader.dirType+") "+self.dataHeader.name
+                )
+            print "-"*80
 
         for d in data:
             totMemSize  += 0. if PoolOpts.FAST_MODE else d.memSize
             totDiskSize += d.diskSize
             memSizeNoZip = d.memSizeNoZip/d.memSize if d.memSize != 0. else 0.
-            print PoolOpts.ROW_FORMAT % (
-                _get_val (d.memSize),
-                d.diskSize,
-                _safe_div(d.diskSize, float(self.dataHeader.nEntries)),
-                _get_val (memSizeNoZip),
-                d.nEntries,
-                "("+d.dirType+") "+d.name
-                )
+            if self.verbose==True:
+                print PoolOpts.ROW_FORMAT % (
+                    _get_val (d.memSize),
+                    d.diskSize,
+                    _safe_div(d.diskSize, float(self.dataHeader.nEntries)),
+                    _get_val (memSizeNoZip),
+                    d.nEntries,
+                    "("+d.dirType+") "+d.name
+                    )
 
-        print "="*80
-        print PoolOpts.ROW_FORMAT % (
-            totMemSize,
-            totDiskSize,
-            _safe_div(totDiskSize, float(self.dataHeader.nEntries)),
-            0.0,
-            self.dataHeader.nEntries,
-            "TOTAL (POOL containers)"
-            )
-        print "="*80
-        if PoolOpts.FAST_MODE:
-            print "::: warning: FAST_MODE was enabled: some columns' content ",
-            print "is meaningless..."
+        if self.verbose==True:
+            print "="*80
+            print PoolOpts.ROW_FORMAT % (
+                totMemSize,
+                totDiskSize,
+                _safe_div(totDiskSize, float(self.dataHeader.nEntries)),
+                0.0,
+                self.dataHeader.nEntries,
+                "TOTAL (POOL containers)"
+                )
+            print "="*80
+            if PoolOpts.FAST_MODE:
+                print "::: warning: FAST_MODE was enabled: some columns' content ",
+                print "is meaningless..."
         return
 
     def detailedDump(self, bufferName = sys.stdout.name ):
