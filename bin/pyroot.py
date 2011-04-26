@@ -1,4 +1,4 @@
-"exec" "`which python`" "-tti" "$0" "$@";
+"exec" "`which python`" "-tt" "$0" "$@";
 
 # File: pyroot.py
 # Author: Sebastien Binet (binet@cern.ch)
@@ -109,7 +109,10 @@ if runBatch:
  # in batch there is no need for stdin
    if os.isatty( sys.stdin.fileno() ):
       os.close( sys.stdin.fileno() )
+   if 'PYTHONINSPECT' in os.environ:
+      os.unsetenv('PYTHONINSPECT')
 else:
+   os.environ['PYTHONINSPECT'] = '1'
  # readline support
    import rlcompleter, readline
 

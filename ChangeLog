@@ -1,3 +1,9 @@
+2011-04-26  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-66
+	* fix bug #81453: py-26 fix for interactive usage
+	* M bin/pyroot.py
+
 2011-04-23  Sebastien Binet  <sebastien.binet@cern.ch>
 
 	* tagging PyUtils-00-10-65
