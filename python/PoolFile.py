@@ -420,7 +420,6 @@ class PoolOpts(object):
 def _get_total_size (branch):
    if PoolOpts.FAST_MODE:
        return -1.
-   return branch.GetTotalSize()
    brSize = 0
    branch.LoadBaskets()
    for bnum in range(0, branch.GetWriteBasket()):
