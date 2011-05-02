@@ -366,6 +366,12 @@ class AthFileServer(object):
         #self._msg = mp.get_logger("AthFile")
         #self._msg.setFormat("Py:%(name)-14s%(levelname)8s %(message)s")
 
+        # prevent ROOT from looking into $HOME for .rootrc files
+        # we carefully (?) set this environment variable *only* in the forked
+        # subprocess to not stomp on the toes of our parent one which is
+        # user-driven (and might need user-customized macros or configurations)
+        os.environ['ROOTENV_NO_HOME'] = '1'
+        
         #self.msg.info('importing ROOT...')
         import PyUtils.RootUtils as ru
         self.pyroot = ru.import_root()

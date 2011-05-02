@@ -1,3 +1,9 @@
+2011-05-02  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-69
+	* use ROOTENV_NO_HOME in athfile forked subprocess
+	* M python/AthFile/impl.py
+
 2011-04-28  Sebastien Binet  <sebastien.binet@cern.ch>
 
 	* tagging PyUtils-00-10-68
