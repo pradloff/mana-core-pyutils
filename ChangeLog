@@ -1,3 +1,9 @@
+2011-05-04  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-70
+	* bug #81808: better protection against empty PoolFileCatalog.xml files
+	* M python/PoolFile.py
+
 2011-05-02  Sebastien Binet  <sebastien.binet@cern.ch>
 
 	* tagging PyUtils-00-10-69

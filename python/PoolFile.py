@@ -151,7 +151,10 @@ class PoolFileCatalog(object):
         for c in catalog:
             try:
                 bc = _build_catalog(c)
-                files = bc.get('POOLFILECATALOG',{}).get('File',[])
+                pc = bc.get('POOLFILECATALOG',{})
+                files = []
+                if pc:
+                    files = pc.get('File',[])
                 if isinstance(files, dict):
                     files = [files]
                 cat['POOLFILECATALOG']['File'].extend(files)
