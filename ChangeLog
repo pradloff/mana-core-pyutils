@@ -1,3 +1,8 @@
+2011-05-11 Ilija Vukotic <ilija@vukotic.me>
+	* tagging PyUtils-00-10-50-06
+	* possibility to turn off printouts when not needed
+	* M python/PoolFile.py
+	
 2011-04-28  Sebastien Binet  <sebastien.binet@cern.ch>
 
 	* tagging PyUtils-00-10-50-05
