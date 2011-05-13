@@ -19,6 +19,7 @@ mp = multiprocessing
 
 import PyUtils.Helpers as H
 from PyUtils.Helpers    import ShutUp
+from .timerdecorator import timelimit, TimeoutError
 
 # -----------------------------------------------------------------------------
 # properly setup tempfile.gettempdir() to prevent from creating
@@ -47,6 +48,9 @@ del _afs_fixup_tempdir
 ### globals -------------------------------------------------------------------
 DEFAULT_AF_CACHE_FNAME = os.environ.get('DEFAULT_AF_CACHE_FNAME',
                                         'athfile-cache.ascii')
+
+DEFAULT_AF_TIMEOUT = 10
+'''Default timeout for commands to be completed.'''
 
 ### utils ----------------------------------------------------------------------
 def _find_file(filename, pathlist, access):
@@ -270,6 +274,16 @@ class AthFile (object):
     
     pass # AthFile class
 
+class AthFileSubprocess(mp.Process):
+    
+    def join(self, timeout=DEFAULT_AF_TIMEOUT):
+        '''
+        Wait until child process terminates
+        '''
+        import sys
+        return mp.Process.join(self, timeout)
+        
+
 class AthFileMgr(mp.managers.BaseManager):
     """the manager of AthFile functionalities
     """
@@ -282,7 +296,7 @@ class AthFileMgr(mp.managers.BaseManager):
         '''
         State = mp.managers.State
         connection = mp.connection
-        Process = mp.process.Process
+        Process = AthFileSubprocess
         util = mp.util
         assert self._state.value == State.INITIAL
 
@@ -352,6 +366,12 @@ class AthFileServer(object):
         #self._msg = mp.get_logger("AthFile")
         #self._msg.setFormat("Py:%(name)-14s%(levelname)8s %(message)s")
 
+        # prevent ROOT from looking into $HOME for .rootrc files
+        # we carefully (?) set this environment variable *only* in the forked
+        # subprocess to not stomp on the toes of our parent one which is
+        # user-driven (and might need user-customized macros or configurations)
+        os.environ['ROOTENV_NO_HOME'] = '1'
+        
         #self.msg.info('importing ROOT...')
         import PyUtils.RootUtils as ru
         self.pyroot = ru.import_root()
@@ -604,7 +624,11 @@ class AthFileServer(object):
         if (os.path.exists(fname) and
             os.access(fname, os.R_OK)):
             msg.info('loading cache from [%s]...', fname)
-            self.load_cache(fname)
+            try:
+                self.load_cache(fname)
+                msg.info('loading cache from [%s]... [done]', fname)
+            except TimeoutError:
+                msg.info('loading cache timed out!')
         return
 
     def disable_pers_cache(self):
@@ -638,6 +662,7 @@ class AthFileServer(object):
             pass
         return
     
+    @timelimit(timeout=5)
     def load_cache(self, fname=DEFAULT_AF_CACHE_FNAME):
         """load file informations from a cache file.
         the back-end (JSON, ASCII, pickle, ...) is inferred from the

@@ -1,8 +1,24 @@
+2011-05-13  Sebastien Binet  <binet@voatlas51.cern.ch>
+
+	* tagging PyUtils-00-10-50-07
+	* bug #81808: better protection against empty PoolFileCatalog.xml files
+	* make sure PoolFile.checkFile gets AtlasCore as an environment
+	* use ROOTENV_NO_HOME in athfile forked subprocess
+	* prevent AthFile from freezing when invocated from an 'athena -i' job
+	* tentative fix for bug #79926: if the timeout is reached, catch
+          and carry on (HeavyIon jobs tend to have gazillions of entries
+          which make the athfile-infos.ascii huge-ish and slow to read)
+	* do not set any timeout when run from within valgrind
+	* tentative fix for bug #78111: add a timeout around the cache loading method.
+	* M python/AthFile/impl.py
+	* M python/AthFile/timerdecorator.py
+	* M python/PoolFile.py
+
 2011-05-11 Ilija Vukotic <ilija@vukotic.me>
 	* tagging PyUtils-00-10-50-06
 	* possibility to turn off printouts when not needed
 	* M python/PoolFile.py
-	
+
 2011-04-28  Sebastien Binet  <sebastien.binet@cern.ch>
 
 	* tagging PyUtils-00-10-50-05
