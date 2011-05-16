@@ -51,7 +51,12 @@ if __name__ == "__main__":
        action  = "store_true",
        help = "Switch to enable the fast mode of checkFile.py (memory size will not be accurate -AT ALL-)"
        )
-    
+    p( "--detailed-branch-size",
+       dest = "super_detailed_branch_sz",
+       default = False,
+       action  = "store_true",
+       help = "Switch to enable a very detailed computation of the branch sizes (computed from the basket length) [SLOW]"
+       )
     (options, args) = parser.parse_args()
 
     fileNames = []
@@ -74,6 +79,7 @@ if __name__ == "__main__":
         try:
             import PyUtils.PoolFile as PF
             PF.PoolOpts.FAST_MODE = options.fastMode
+            PF.PoolOpts.SUPER_DETAILED_BRANCH_SZ = options.super_detailed_branch_sz
             poolFile = PF.PoolFile( fileName )
             poolFile.checkFile( sorting = options.sortFctName )
             if options.doDetailedDump:
