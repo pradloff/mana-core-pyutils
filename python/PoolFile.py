@@ -397,6 +397,7 @@ def extract_streams_from_tag (fname,
 
 class PoolOpts(object):
     FAST_MODE   = False
+    SUPER_DETAILED_BRANCH_SZ = False
     READ_MODE   = "READ"
     POOL_HEADER = "POOLContainer_"
     EVENT_DATA  = "CollectionTree"
@@ -423,6 +424,8 @@ class PoolOpts(object):
 def _get_total_size (branch):
    if PoolOpts.FAST_MODE:
        return -1.
+   if not PoolOpts.SUPER_DETAILED_BRANCH_SZ:
+       return branch.GetTotalSize()
    brSize = 0
    branch.LoadBaskets()
    for bnum in range(0, branch.GetWriteBasket()):

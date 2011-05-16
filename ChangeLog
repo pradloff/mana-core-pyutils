@@ -1,3 +1,11 @@
+2011-05-16  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-71
+	* fix performance regression in diffPoolFiles stemming from a
+	  perhaps too detailed branch size calculation.
+	  use checkFile --detailed-branch-size to enable it.
+	* M python/PoolFile.py
+
 2011-05-04  Sebastien Binet  <sebastien.binet@cern.ch>
 
 	* tagging PyUtils-00-10-70
