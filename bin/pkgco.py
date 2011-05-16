@@ -59,13 +59,27 @@ def svn_tag_equals_trunk(pkg,tag):
    Return: True/False
    """
 
-   svnroot = os.environ.get("SVNROOT")
-   if svnroot==None:
+   env = dict(os.environ)
+   
+   svnroot = env.get("SVNROOT", None)
+   if svnroot is None:
       raise RuntimeError, "SVNROOT is not set"
 
-   pkg = os.path.join(svnroot, pkg)
-   cmd = "svn diff %s/tags/%s %s/trunk" % (pkg,tag,pkg)
-   p = subprocess.Popen(cmd, stdout = subprocess.PIPE, shell=True)
+   pkg_url = os.path.join(svnroot, pkg)
+   if pkg.startswith('Gaudi'):
+      env['GAUDISVN'] = env.get('GAUDISVN',
+                                'http://svnweb.cern.ch/guest/gaudi')
+      svnroot = env['SVNROOT'] = '${GAUDISVN}/Gaudi'
+      env['SVNTRUNK'] = 'trunk'
+      env['SVNTAGS'] = 'tags'
+      tag_url = '/'.join([svnroot, 'tags', pkg])
+      trunk_url = '/'.join([svnroot, 'trunk', pkg])
+      cmd = 'svn diff %(tag_url)s %(trunk_url)s' % {'tag_url':tag_url,
+                                                    'trunk_url':trunk_url}
+   else:
+      cmd = "svn diff %s/tags/%s %s/trunk" % (pkg,tag,pkg)
+
+   p = subprocess.Popen(cmd, stdout = subprocess.PIPE, shell=True, env=env)
    stdout,stderr = p.communicate()
    if stderr!=None:
       print stderr
@@ -76,7 +90,7 @@ def svn_tag_equals_trunk(pkg,tag):
       
 def checkout(pkg, head, doCheckOut=True, showRecent=False):
    """Checkout one package."""
-
+   
    tag = ""
    # If "-" in name, tag was given
    if pkg.find('-') != -1:
@@ -88,18 +102,64 @@ def checkout(pkg, head, doCheckOut=True, showRecent=False):
 
    # Remove leading "/" for CMT checkout
    pkg = string.lstrip(pkg, "/")
+
+   # special treatment of Gaudi packages...
+   if pkg.startswith('Gaudi'):
+      env = dict(os.environ)
+      env['GAUDISVN'] = env.get('GAUDISVN',
+                                'http://svnweb.cern.ch/guest/gaudi')
+      env['SVNROOT'] = '%(GAUDISVN)s/Gaudi' % env
+      env['SVNTRUNK'] = 'trunk'
+      env['SVNTAGS'] = 'tags'
+
+      env['pkg'] = pkg
+      if head:
+         cmd = 'svn co %(SVNROOT)s/%(SVNTRUNK)s/%(pkg)s %(pkg)s' % env
+      else:
+         if len(tag)==0:
+            tag = cmt.get_pkg_version(pkg)      
+            if tag is None:
+               raise RuntimeError, "Could not find any tag for '%s'" % pkg
+         env['tag'] = tag
+         cmd = 'svn co %(SVNROOT)s/%(SVNTAGS)s/%(pkg)s/%(tag)s %(pkg)s' % env
+         pass
+      #print ">>> [%s]" % cmd
+      if doCheckOut:
+         subprocess.check_call(cmd,
+                               shell=True,
+                               env=env)
+         subprocess.check_call("cd %(pkg)s/cmt && cmt config" % env,
+                               shell=True,
+                               env=env)
+         
+      else:
+         msg = "%s %s" % (tag,pkg)
+         if (showRecent):
+            headversion = cmt.get_latest_pkg_tag(pkg)
+            if not (headversion is None):
+               istrunk = svn_tag_equals_trunk(pkg,headversion)
+            else:
+               istrunk = False
+               headversion="NONE"
+
+            msg += "  (most recent %s %s trunk)" % (headversion, "==" if istrunk else "!=")
+
+
+         print msg
+      return
    
    if head:
-     os.system("cmt co %s" % pkg)
-     return
+      subprocess.check_call("cmt co %s" % pkg)
+      return
    
    if len(tag)==0:
       tag = cmt.get_pkg_version(pkg)      
-      if tag==None:
+      if tag is None:
          raise RuntimeError, "Could not find any tag for '%s'" % pkg
 
    if doCheckOut:
-      os.system("cmt co -r %s %s" % (tag,pkg))
+      subprocess.check_call("cmt co -r %s %s" % (tag,pkg),
+                            shell=True)
    else:
       msg = "%s %s" % (tag,pkg)
       if (showRecent):

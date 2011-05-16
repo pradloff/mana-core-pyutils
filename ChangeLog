@@ -1,5 +1,9 @@
 2011-05-16  Sebastien Binet  <sebastien.binet@cern.ch>
 
+	* tagging PyUtils-00-10-72
+	* support for Gaudi packages
+	* M bin/pkgco.py
+
 	* tagging PyUtils-00-10-71
 	* fix performance regression in diffPoolFiles stemming from a
 	  perhaps too detailed branch size calculation.
