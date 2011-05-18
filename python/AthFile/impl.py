@@ -1057,6 +1057,8 @@ class FilePeeker(object):
                         if os.path.exists(out_pkl_fname):
                             os.remove(out_pkl_fname)
                         import AthenaCommon.ChapPy as api
+                        # make sure we don't run the peeking-athena job in MP mode...
+                        os.putenv('ATHENA_PROC_NUMBER', '0')
                         app = api.AthenaApp(cmdlineargs=["--nprocs=0"])
                         app << """
                             FNAME = %s
