@@ -149,7 +149,8 @@ def checkout(pkg, head, doCheckOut=True, showRecent=False):
       return
    
    if head:
-      subprocess.check_call("cmt co %s" % pkg)
+      cmd = "cmt co %r" % pkg
+      subprocess.check_call(cmd, shell=True)
       return
    
    if len(tag)==0:

@@ -1,3 +1,10 @@
+2011-05-18  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-73
+	* support for Gaudi packages
+	* fixed regression introduced by refactoring w/ -72
+	* M bin/pkgco.py
+
 2011-05-16  Sebastien Binet  <sebastien.binet@cern.ch>
 
 	* tagging PyUtils-00-10-72
