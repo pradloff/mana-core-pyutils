@@ -1,3 +1,9 @@
+2011-05-20  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-74
+	* obo V.Tsulaia: fixup for AthenaMP
+	* M python/AthFile/impl.py
+
 2011-05-18  Sebastien Binet  <sebastien.binet@cern.ch>
 
 	* tagging PyUtils-00-10-73
