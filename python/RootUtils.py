@@ -223,8 +223,12 @@ class RootFileDumper(object):
                   ',' in itr_entries):
                 itr_entries = eval(itr_entries)
             else:
-                print "** err ** invalid 'itr_entries' argument. will iterate over all entries."
-                itr_entries = xrange(itr_entries)
+                try:
+                    _n = int(itr_entries)
+                    itr_entries = xrange(_n)
+                except ValueError:
+                    print "** err ** invalid 'itr_entries' argument. will iterate over all entries."
+                    itr_entries = xrange(nentries)
         else:
             itr_entries = xrange(itr_entries)
                 

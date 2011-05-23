@@ -17,6 +17,14 @@ import PyUtils.acmdlib as acmdlib
 @acmdlib.argument('-t', '--tree-name',
                   default=None,
                   help='name of the TTree to dump (default:all)')
+@acmdlib.argument('-r', '--range',
+                  default=None,
+                  help="""range of events to parse (default:all).
+                  ex: --range='0:10' to get the first 10 events
+                      --range='10:20:2' to get the even events between 10 and 20
+                      --range='range(10)' to get the first 10 events
+                      --range=10 to get the first 10 events
+                  """)
 @acmdlib.argument('-v', '--verbose',
                   action='store_true',
                   default=False,
@@ -59,6 +67,8 @@ def main(args):
     for tree_name in tree_names:
         f = ru.RootFileDumper(args.fname, tree_name)
         nentries = f.tree.GetEntries()
+        if args.range:
+            nentries = args.range
         for d in f.dump(tree_name, nentries):
             tree_name, ientry, name, data = d
             n = '.'.join(map(str, [tree_name,"%03i"%ientry]+name))
