@@ -1,3 +1,9 @@
+2011-05-23  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-75
+	* add a --range option to dump-root-file to dump parts of a file
+	* M python/scripts/dump_root_file.py
+
 2011-05-20  Sebastien Binet  <sebastien.binet@cern.ch>
 
 	* tagging PyUtils-00-10-74
