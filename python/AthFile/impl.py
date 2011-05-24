@@ -47,12 +47,38 @@ del _afs_fixup_tempdir
         
 ### globals -------------------------------------------------------------------
 DEFAULT_AF_CACHE_FNAME = os.environ.get('DEFAULT_AF_CACHE_FNAME',
-                                        'athfile-cache.ascii')
+                                        'athfile-cache.ascii.gz')
 
 DEFAULT_AF_TIMEOUT = 10
 '''Default timeout for commands to be completed.'''
 
 ### utils ----------------------------------------------------------------------
+
+def _get_real_ext(fname):
+    """little helper to get the 'real' extension of a filename, handling 'fake' extensions (e.g. foo.ascii.gz -> .ascii)"""
+    se = os.path.splitext
+    f,ext = se(fname)
+    if ext in ('.gz',):
+        _,ext = se(f)
+    return ext
+
+def _my_open(name, mode='r', bufsiz=-1):
+    """helper method to handle gzipped or not files.
+    if `name` ends with '.gz' the correct gzip.open function will be called.
+    """
+    f,ext = os.path.splitext(name)
+    if ext in ('.gz',):
+        import gzip
+        def gzip_exit(self, type, value, traceback):
+            return self.close()
+        def gzip_enter(self):
+            return self
+        gzip.GzipFile.__exit__ = gzip_exit
+        gzip.GzipFile.__enter__= gzip_enter
+        return gzip.open(name, mode)
+    else:
+        return open(name, mode, bufsiz)
+    
 def _find_file(filename, pathlist, access):
     """Find <filename> with rights <access> through <pathlist>."""
     import os
@@ -621,7 +647,8 @@ class AthFileServer(object):
         
         import os
         fname = DEFAULT_AF_CACHE_FNAME
-        if (os.path.exists(fname) and
+        if (fname and
+            os.path.exists(fname) and
             os.access(fname, os.R_OK)):
             msg.info('loading cache from [%s]...', fname)
             try:
@@ -648,7 +675,13 @@ class AthFileServer(object):
         if not fname:
             # protect against empty or invalid (None) cache file names
             return
-        pid_fname = fname+'.%s.ascii'%os.getpid()
+        pid = str(os.getpid())
+        fname_,fname_ext = os.path.splitext(fname)
+        if fname_ext in ('.gz',):
+            fname_,fname_ext = os.path.splitext(fname_)
+            pid_fname = fname_ + '.' + pid + fname_ext + ".gz"
+        else:
+            pid_fname = fname_ + '.' + pid + fname_ext
         msg.debug('synch-ing cache to [%s]...', fname)
         try:
             self.save_cache(pid_fname)
@@ -672,13 +705,12 @@ class AthFileServer(object):
         import os
         import os.path as osp
         msg = self.msg()
-        
-        ext = osp.splitext(osp.basename(fname))[1]
+
+        ext = _get_real_ext(osp.basename(fname))
         if len(ext) == 0:
             # illegal file...
             msg.info('load_cache: invalid file [%s]', fname)
             return
-        
         ext = ext[1:] if ext[0]=='.' else ext
         try:
             loader = getattr(self, '_load_%s_cache'%ext)
@@ -701,7 +733,12 @@ class AthFileServer(object):
             pass
 
         msg.debug('loading cache from [%s]...', fname)
-        cache = loader(fname)
+        cache = {}
+        try:
+            cache = loader(fname)
+        except Exception, err:
+            msg.info("problem loading cache from [%s]!", fname)
+            msg.info(repr(err))
         self._cache.update(cache)
         msg.debug('loading cache from [%s]... [done]', fname)
 
@@ -715,7 +752,7 @@ class AthFileServer(object):
         import os
         if os.path.exists(fname):
             os.rename(fname, fname+'.bak')
-        ext = os.path.splitext(fname)[1]
+        ext = _get_real_ext(fname)
         ext = ext[1:] # drop the dot
         try:
             saver = getattr(self, '_save_%s_cache'%ext)
@@ -758,7 +795,7 @@ class AthFileServer(object):
             import simplejson as json
         except ImportError:
             import json
-        with open(fname) as fd:
+        with _my_open(fname) as fd:
             cache = json.load(fd)
         return dict((k,AthFile.from_infos(v)) for k,v in cache)
         
@@ -769,7 +806,7 @@ class AthFileServer(object):
         except ImportError:
             import json
         cache = self._cache
-        with open(fname, 'w') as fd:
+        with _my_open(fname, 'w') as fd:
             json.dump([(k, cache[k].fileinfos) for k in cache],
                       fd,
                       indent=2,
@@ -779,15 +816,22 @@ class AthFileServer(object):
     def _load_ascii_cache(self, fname):
         """load file informations from a pretty-printed python code"""
         dct = {}
-        execfile(fname, dct)
-        cache = dct['fileinfos']
+        ast = compile(_my_open(fname).read(), fname, 'exec')
+        exec ast in dct,dct
+        del ast
+        try:
+            cache = dct['fileinfos']
+        except Exception, err:
+            raise
+        finally:
+            del dct
         return dict((k,AthFile.from_infos(v)) for k,v in cache)
     
     def _save_ascii_cache(self, fname):
         """save file informations into pretty-printed python code"""
         from pprint import pprint
         cache = self._cache
-        with open(fname, 'w') as fd:
+        with _my_open(fname, 'w') as fd:
             print >> fd, "# this is -*- python -*-"
             print >> fd, "# this file has been automatically generated."
             print >> fd, "fileinfos = ["
@@ -803,6 +847,25 @@ class AthFileServer(object):
             print >> fd, "]"
             print >> fd, "### EOF ###"
             
+        return
+    
+    def _load_db_cache(self, fname):
+        """load file informations from a sqlite file"""
+        import PyUtils.dbsqlite as dbsqlite
+        cache = dbsqlite.open(fname)
+        d = {}
+        for k,v in cache.iteritems():
+            d[k] = AthFile.from_infos(v)
+        return d
+        
+    def _save_db_cache(self, fname):
+        """save file informations using sqlite"""
+        import PyUtils.dbsqlite as dbsqlite
+        db = dbsqlite.open(fname,flags='w')
+        cache = self._cache
+        for k in cache:
+            db[k] = cache[k].fileinfos
+        db.close()
         return
     
     def flush_cache(self):
