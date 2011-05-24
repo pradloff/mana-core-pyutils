@@ -31,6 +31,7 @@ import sys
 import os
 import commands
 import string
+import subprocess
 
 tagchars = string.ascii_letters + string.digits + '-'
 
@@ -258,11 +259,11 @@ def main(args):
         if s in ('-m', '--message'):
             do_mung = False
 
-    cmd = string.join(args)
+    cmd = subprocess.list2cmdline(args)
     print cmd
     sc = 0
     if not avn.dryrun:
-        sc = os.system (cmd)
+        sc = subprocess.call(args)
 
     return sc
 
