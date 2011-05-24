@@ -117,7 +117,7 @@ def main(args):
                       fnew.dump(args.tree_name, itr_entries)):
             tree_name, ientry, name, iold = d[0]
             _,              _,    _, inew = d[1]
-            if (not (name[0] in leaves) or
+            if ((not (name[0] in leaves)) or
                 # FIXME: that's a plain (temporary?) hack
                 name[-1] in args.known_hacks):
                 continue
@@ -129,9 +129,12 @@ def main(args):
             n_bad += 1
             diff = True
 
-            assert d[0][:-1] == d[1][:-1], \
-                   "comparison iterators out of sync!\n%s != %s" % \
-                   (d[0][:-1], d[1][:-1])
+            in_synch = d[0][:-1] == d[1][:-1]
+            if not in_synch:
+                print '::sync-old %s' % '.'.join(["%03i"%ientry]+map(str, d[0][2]))
+                print '::sync-new %s' % '.'.join(["%03i"%ientry]+map(str, d[1][2]))
+                summary[name[0]] += 1
+                continue
             
             n = '.'.join(map(str, ["%03i"%ientry]+name))
             diff_value = 'N/A'
@@ -147,7 +150,6 @@ def main(args):
                 msg.info("don't compare further")
                 all_good = False
                 break
-            summary[name[0]] += 1
             pass # loop over events/branches
         
         msg.info('Found [%s] identical leaves', n_good)

@@ -1,5 +1,10 @@
 2011-05-24  Sebastien Binet  <sebastien.binet@cern.ch>
 
+	* tagging PyUtils-00-10-78
+	* improve resilience of diff-root-files in the face of
+	  out-of-synch iterators over leaves
+	* M python/scripts/diff_root_files.py
+
 	* tagging PyUtils-00-10-77
 	* fix bug 82176: gzip the athfile-cache files
 	* python/AthFile/impl.py
