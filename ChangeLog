@@ -1,3 +1,17 @@
+2011-05-24  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-77
+	* fix bug 82176: gzip the athfile-cache files
+	* python/AthFile/impl.py
+
+	* tagging PyUtils-00-10-76
+	* fix bug 82547: proper quoting of avn command arguments:
+	  avn ci -m "It's an abbreviation. an escaped double-quote: \""
+	  avn ci -m 'Here is an unescaped double-quote: "'
+	* harmonize --range into --entries
+	* M bin/avn.py
+	* M python/scripts/dump_root_file.py
+
 2011-05-23  Sebastien Binet  <sebastien.binet@cern.ch>
 
 	* tagging PyUtils-00-10-75
