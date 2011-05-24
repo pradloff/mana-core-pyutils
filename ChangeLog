@@ -1,3 +1,11 @@
+2011-05-24  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-76
+	* fix bug 82547: proper quoting of avn command arguments
+	* harmonize --range into --entries
+	* M bin/avn.py
+	* M python/scripts/dump_root_file.py
+
 2011-05-23  Sebastien Binet  <sebastien.binet@cern.ch>
 
 	* tagging PyUtils-00-10-75
