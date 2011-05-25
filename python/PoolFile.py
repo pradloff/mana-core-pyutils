@@ -1157,7 +1157,13 @@ def merge_pool_files(input_files, output_file,
         # main jobos
         include ('RecExCond/RecExCommon_flags.py')
         include ('RecExCommon/RecExCommon_topOptions.py')
-
+    elif cfg.is_hits():
+        import AthenaCommon.DetFlags as acdf
+        acdf.DetFlags.detdescr.all_setOn()
+        import AtlasGeoModel.SetGeometryVersion
+        import AtlasGeoModel.GeoModelInit
+        import AtlasGeoModel.SetupRecoGeometry
+    
     # adding the merged output-stream
     
     """) % {
