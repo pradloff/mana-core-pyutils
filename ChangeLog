@@ -1,3 +1,9 @@
+2011-05-25  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-79
+	* obo Vahko: support for merging HITS files
+	* M python/PoolFile.py
+
 2011-05-24  Sebastien Binet  <sebastien.binet@cern.ch>
 
 	* tagging PyUtils-00-10-78
