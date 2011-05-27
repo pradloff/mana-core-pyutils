@@ -17,6 +17,8 @@ if 0:
 
     import PyUtils.xmldict as _x
 
+    clients_cmd = 'TCListPackageVersionClient  -processingStep=production -project=TagCollector   -groupName=AtlasOffline -releaseName=17.0.1 -fullPackageName=/AtlasTest/AthenaMPTest -repositoryName=AtlasOfflineRepository'.split(' ')
+    
     rec_cmd = 'TCFormGetDependencyPackageVersionTree -expandedPackageID="*" -expandedTopContainerPackage="*" -groupName="AtlasProduction" -processingStep="production" -project="TagCollector" -releaseName="15.7.0"'.replace('"','').split(' ')
     res = amiclient.execute(rec_cmd)
     dd = _x.xml2dict(ET.fromstring(res.transform('xml')))
@@ -276,6 +278,47 @@ class Client(object):
         ## print "-"*80
         return pkg
 
+    def get_project_of_pkg(self, pkg, release):
+        """
+        retrieve the list of projects from AMI for a given release and package
+        """
+        pkg = self.find_pkg(pkg,check_tag=False)
+        
+        projects = []
+        full_pkg_name = pkg['packagePath']+pkg['packageName'] # pkg['packageTag']
+        try:
+            res = self.exec_cmd(cmd='TCGetPackageVersionHistory',
+                                fullPackageName=full_pkg_name,
+                                releaseName=release)
+            d = ami_todict(res)['AMIMessage']['Result']
+            rows = d['rowset']
+            if isinstance(rows, dict):
+                rows = [rows]
+            ## print "---"
+            ## print dict(d)
+            ## print "---"
+            for row in rows:
+                if not row['type'] in ('Package_version_history',
+                                       'Package_version_history_delete'):
+                    ## print "-- skip [%s]" % row['type']
+                    continue
+                fields = row['row']['field']
+                for field in fields:
+                    n = field.get('name', None)
+                    v = field.get('_text', None)
+                    ## print "[%s] => [%s]" % (n,v)
+                    if n == 'groupName':
+                        ## print "-->",v
+                        projects.append(v)
+                        #return v
+            if not projects:
+                print "::: no project found for package [%s] and release [%s]" % (
+                    full_pkg_name,
+                    release)
+        except amilib.PyAmi.AMI_Error, err:
+            pass
+        return projects
+
     def get_project_tree(self, project, release, recursive=False):
         """return the dependency tree of packages for a given project
         and a given release
@@ -339,7 +382,7 @@ class Client(object):
         cond = lambda x: x.get("status")!="terminated"
         try:
             reltree = ET.fromstring(
-                result.transform("xml")
+                rxml
                 ).find("Result").find("tree")
             releases = [ r.get("releaseName") 
                          for r in reltree.getiterator("treeBranch") 
@@ -354,6 +397,55 @@ class Client(object):
                 )
 
         return releases
-   
+
+    def get_clients(self, project, release, full_pkg_name):
+        """return the list of clients (full-pkg-name, version) of
+        `full_pkg_name` for project `project` and release `release`
+        """
+        args = {
+            'groupName': project, # AtlasOffline, AtlasEvent, ...
+            'releaseName': release,
+            }
+        if full_pkg_name[0] != "/":
+            full_pkg_name = "/"+full_pkg_name
+        args['fullPackageName'] = full_pkg_name
+        
+        result = self.exec_cmd(cmd="TCListPackageVersionClient", args=args)
+        if not result:
+            raise RuntimeError(
+                'error executing TCListPackageVersionClient'
+                )
+        
+        rxml = result.transform('xml')
+        import xml.etree.cElementTree as ET
+        try:
+            rows = xml2dict(ET.fromstring(rxml))['AMIMessage']["Result"]["rowset"]['row']
+        except Exception, e:
+            print e.message
+            raise RuntimeError(
+                'could not parse result of TCListPackageVersionClient:\n%s' % rxml
+                )
+
+        if not isinstance(rows, (tuple,list)):
+            rows = [rows]
+            
+        clients = []
+        for row in rows:
+            fields = row['field']
+            client_name = None
+            client_vers = None
+            for f in fields:
+                if f['name'] == 'fullPackageName':
+                    client_name = f['_text']
+                if f['name'] == 'packageTag':
+                    client_vers = f['_text']
+            if client_name is None or client_vers is None:
+                print "** could not find client-info for:\n%s" % fields
+            else:
+                if client_name[0] == '/':
+                    client_name = client_name[1:]
+                clients.append((client_name, client_vers))
+        return clients
+    
     pass # Client
 
