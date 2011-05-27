@@ -16,6 +16,7 @@ import PyUtils.acmdlib as acmdlib
                   nargs='+',
                   help='(list of) package(s) to show clients of')
 @acmdlib.argument('-r', '--release',
+                  required=True,
                   help='the release in which to show the clients (e.g: 17.0.1)')
 @acmdlib.argument('--co',
                   action='store_true',
