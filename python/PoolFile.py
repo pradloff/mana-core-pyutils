@@ -1163,7 +1163,9 @@ def merge_pool_files(input_files, output_file,
         import AtlasGeoModel.SetGeometryVersion
         import AtlasGeoModel.GeoModelInit
         import AtlasGeoModel.SetupRecoGeometry
-    
+    else:
+        pass
+        
     # adding the merged output-stream
     
     """) % {
