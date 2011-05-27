@@ -1,3 +1,12 @@
+2011-05-27  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-81
+	* adding a new tc command: show-clients to get the list of clients
+	  for a given cmt package (and check them out)
+	* A python/scripts/tc_show_clients.py
+	* M python/AmiLib.py
+	* M python/scripts/__init__.py
+
 2011-05-25  Sebastien Binet  <sebastien.binet@cern.ch>
 
 	* tagging PyUtils-00-10-79
