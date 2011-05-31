@@ -74,10 +74,12 @@ def svn_tag_equals_trunk(pkg,tag):
       env['SVNTAGS'] = 'tags'
       tag_url = '/'.join([svnroot, 'tags', pkg])
       trunk_url = '/'.join([svnroot, 'trunk', pkg])
-      cmd = 'svn diff %(tag_url)s %(trunk_url)s' % {'tag_url':tag_url,
-                                                    'trunk_url':trunk_url}
    else:
-      cmd = "svn diff %s/tags/%s %s/trunk" % (pkg,tag,pkg)
+      tag_url = '/'.join([svnroot, pkg, 'tags', tag])
+      trunk_url= '/'.join([svnroot, pkg, 'trunk'])
+      pass
+   cmd = 'svn diff %(tag_url)s %(trunk_url)s' % {'tag_url':tag_url,
+                                                 'trunk_url':trunk_url}
 
    p = subprocess.Popen(cmd, stdout = subprocess.PIPE, shell=True, env=env)
    stdout,stderr = p.communicate()

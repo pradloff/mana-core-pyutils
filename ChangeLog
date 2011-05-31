@@ -1,3 +1,9 @@
+2011-05-31  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-82
+	* remove spurious printouts when using 'pkgco -r pkg'
+	* M bin/pkgco.py
+
 2011-05-27  Sebastien Binet  <sebastien.binet@cern.ch>
 
 	* tagging PyUtils-00-10-81
