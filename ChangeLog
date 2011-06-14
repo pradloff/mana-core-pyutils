@@ -1,3 +1,15 @@
+2011-06-14  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-84
+	* preliminary work for better support for TAG files
+	* M python/AthFile/impl.py
+
+	* tagging PyUtils-00-10-83
+	* fix bug #83034
+	* do not propagate parent's os.environ for PYTHONINSPECT and
+	  ATHENA_PROC_NUMBER env.vars to AthFileServer process
+	* M python/AthFile/impl.py
+
 2011-05-31  Sebastien Binet  <sebastien.binet@cern.ch>
 
 	* tagging PyUtils-00-10-82
