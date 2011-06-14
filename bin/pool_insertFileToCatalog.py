@@ -30,12 +30,10 @@ def pool_insert(files, catalog_name="xmlcatalog_file:PoolFileCatalog.xml"):
 
     import PyUtils.Helpers as H
     with H.restricted_ldenviron(projects=('AtlasCore',)):
-
         os.environ['POOL_CATALOG'] = catalog_name
-    
         cmd = "%s %s" % (exe, " ".join(files))
         sc, out = commands.getstatusoutput (cmd)
-
+        
     out = os.linesep.join(
         [o for o in out.splitlines()
          if not o.startswith("Warning in <TClass::TClass>: no dictionary for class ")]
@@ -80,4 +78,5 @@ if __name__ == "__main__":
             f = os.path.expandvars(os.path.expanduser(f))
             files.append(f)
 
-    sys.exit(pool_insert(files=files, catalog_name=options.catalog))
+    sc = pool_insert(files=files, catalog_name=options.catalog)
+    sys.exit(sc)
