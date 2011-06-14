@@ -1021,10 +1021,13 @@ class FilePeeker(object):
                                   fname)
                 return f
         
-    def _is_tag_file(self, fname):
+    def _is_tag_file(self, fname, evtmax):
         is_tag = False
         tag_ref= None
         tag_guid=None
+        nentries = 0
+        runs=[]
+        evts=[]
         import PyUtils.Helpers as H
         with H.restricted_ldenviron(projects=['AtlasCore']):
             root = self.pyroot
@@ -1046,10 +1049,24 @@ class FilePeeker(object):
                 assert metadata.Key == 'POOLCollectionID' 
                 tag_guid = metadata.Value
             del metadata
+            coll_tree = f.Get('POOLCollectionTree') if f else None
+            if coll_tree:
+                nentries = coll_tree.GetEntries()
+                if evtmax in (-1, None):
+                    evtmax = nentries
+                evtmax = int(evtmax)
+                for row in xrange(evtmax):
+                    if coll_tree.GetEntry(row) < 0:
+                        break
+                    runnbr = coll_tree.RunNumber
+                    runs.append(runnbr)
+                    evtnbr = coll_tree.EventNumber
+                    evts.append(evtnbr)
+            del coll_tree
             if f and do_close:
                 f.Close()
                 del f
-        return (is_tag, tag_ref, tag_guid)
+        return (is_tag, tag_ref, tag_guid, nentries, runs, evts)
 
     def _is_empty_pool_file(self, fname):
         is_empty = False
@@ -1091,7 +1108,7 @@ class FilePeeker(object):
 
             # make sure we don't run the peeking-athena job in MP mode...
             if 'ATHENA_PROC_NUMBER' in os.environ:
-                os.unsetenv('ATHENA_PROC_NUMBER')
+                del os.environ['ATHENA_PROC_NUMBER']
                 pass
             
             protocol,file_name = self.server.fname(fname)
@@ -1109,10 +1126,13 @@ class FilePeeker(object):
                 commands.getstatusoutput(cmd)
                 #
                 with H.restricted_ldenviron(projects=projects):
-                    is_tag, tag_ref, tag_guid = self._is_tag_file(f_root)
+                    is_tag, tag_ref, tag_guid, nentries, runs, evts = self._is_tag_file(f_root, evtmax)
                     if is_tag:
                         f['stream_names'] = ['TAG']
                         f['file_guid'] = tag_guid
+                        f['nentries'] = nentries
+                        f['run_number'] = runs
+                        f['evt_number'] = evts
                     else:
                         import tempfile
                         #'peeker_%i.pkl' % os.getpid()
