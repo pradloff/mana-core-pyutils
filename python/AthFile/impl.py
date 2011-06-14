@@ -415,11 +415,11 @@ class AthFileServer(object):
 
         # prevent from running athena-mp in child processes
         if 'ATHENA_PROC_NUMBER' in os.environ:
-            os.unsetenv('ATHENA_PROC_NUMBER')
+            del os.environ['ATHENA_PROC_NUMBER']
             
         # prevent from running athena in interactive mode (and freeze)
         if 'PYTHONINSPECT' in os.environ:
-            os.unsetenv('PYTHONINSPECT')
+            del os.environ['PYTHONINSPECT']
             
         # instantiate a "request handler"
         self._peeker = FilePeeker(self)
@@ -431,7 +431,10 @@ class AthFileServer(object):
         variables
         """
         self._msg.debug("-> os.environ[%s] = %s", k, v)
-        os.environ[k] = v
+        if not k in ('PYTHONINSPECT','ATHENA_PROC_NUMBER'):
+            os.environ[k] = v
+        else:
+            self._msg.debug("-> os.environ[%s] = %s (DISCARDED!!)", k, v)
     
     def _cleanup_pyroot(self):
         import PyUtils.RootUtils as ru
