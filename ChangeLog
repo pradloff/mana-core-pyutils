@@ -1,5 +1,11 @@
 2011-06-15  Sebastien Binet  <sebastien.binet@cern.ch>
 
+	* tagging PyUtils-00-10-86
+	* fixes for tc-show-clients and tc-submit-tag
+	* M python/scripts/tc_submit_tag.py
+	* M python/scripts/tc_show_clients.py
+	* M python/AmiLib.py
+
 	* tagging PyUtils-00-10-85
 	* update ref-test for TAG
 	* M python/AthFile/tests.py
