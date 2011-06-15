@@ -1,3 +1,9 @@
+2011-06-15  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-10-85
+	* update ref-test for TAG
+	* M python/AthFile/tests.py
+
 2011-06-14  Sebastien Binet  <sebastien.binet@cern.ch>
 
 	* tagging PyUtils-00-10-84
