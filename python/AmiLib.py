@@ -312,12 +312,55 @@ class Client(object):
                         projects.append(v)
                         #return v
             if not projects:
-                print "::: no project found for package [%s] and release [%s]" % (
+                self.msg.error(
+                    "no project found for package [%s] and release [%s]",
                     full_pkg_name,
                     release)
         except amilib.PyAmi.AMI_Error, err:
             pass
         return projects
+
+    def get_version_of_pkg(self, pkg, release):
+        """
+        retrieve the list of versions from AMI for a given release and package
+        """
+        pkg = self.find_pkg(pkg,check_tag=False)
+        
+        versions = []
+        full_pkg_name = pkg['packagePath']+pkg['packageName'] # pkg['packageTag']
+        try:
+            res = self.exec_cmd(cmd='TCGetPackageVersionHistory',
+                                fullPackageName=full_pkg_name,
+                                releaseName=release)
+            d = ami_todict(res)['AMIMessage']['Result']
+            rows = d['rowset']
+            if isinstance(rows, dict):
+                rows = [rows]
+            ## print "---"
+            ## print dict(d)
+            ## print "---"
+            for row in rows:
+                if not row['type'] in ('Package_version_history',
+                                       'Package_version_history_delete'):
+                    ## print "-- skip [%s]" % row['type']
+                    continue
+                fields = row['row']['field']
+                for field in fields:
+                    n = field.get('name', None)
+                    v = field.get('_text', None)
+                    ## print "[%s] => [%s]" % (n,v)
+                    if n == 'packageTag':
+                        ## print "-->",v
+                        versions.append(v)
+                        #return v
+            if not versions:
+                self.msg.error(
+                    "no version found for package [%s] and release [%s]",
+                    full_pkg_name,
+                    release)
+        except amilib.PyAmi.AMI_Error, err:
+            pass
+        return versions
 
     def get_project_tree(self, project, release, recursive=False):
         """return the dependency tree of packages for a given project
@@ -391,7 +434,7 @@ class Client(object):
             # Filter all special purpose releases (e.g. -MIG, -SLHC)
             releases = filter(lambda x: x.count("-")==0, releases)
         except Exception, e:
-            print e.message
+            self.msg.error(e.message)
             raise RuntimeError(
                 'Could not parse result of TCFormGetReleaseTreeDevView:\n%s' % rxml
                 )
@@ -421,7 +464,7 @@ class Client(object):
         try:
             rows = xml2dict(ET.fromstring(rxml))['AMIMessage']["Result"]["rowset"]['row']
         except Exception, e:
-            print e.message
+            self.msg.error(e.message)
             raise RuntimeError(
                 'could not parse result of TCListPackageVersionClient:\n%s' % rxml
                 )
@@ -434,17 +477,23 @@ class Client(object):
             fields = row['field']
             client_name = None
             client_vers = None
+            release_vers = None
+            group_name = None
             for f in fields:
                 if f['name'] == 'fullPackageName':
                     client_name = f['_text']
-                if f['name'] == 'packageTag':
+                elif f['name'] == 'packageTag':
                     client_vers = f['_text']
+                elif f['name'] == 'releaseName':
+                    release_vers = f['_text']
+                elif f['name'] == 'groupName':
+                    group_name = f['_text']
             if client_name is None or client_vers is None:
-                print "** could not find client-info for:\n%s" % fields
+                self.msg.warning("could not find client-info for:\n%s", fields)
             else:
                 if client_name[0] == '/':
                     client_name = client_name[1:]
-                clients.append((client_name, client_vers))
+                clients.append((client_name, client_vers, release_vers, group_name))
         return clients
     
     pass # Client
