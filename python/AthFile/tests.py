@@ -308,7 +308,7 @@ class AthFileTest(unittest.TestCase):
             print "::: f10.fileinfos:"
             print f10.fileinfos
 
-        f10_ref = {'metadata_items': None, 'stream_names': ['TAG'], 'run_type': [], 'stream_tags': [], 'evt_type': [], 'tag_info': None, 'file_type': 'pool', 'file_name': 'root://castoratlas//castor/cern.ch/user/b/binet/utests/athfile/TAG.102229._000001.pool.root.1', 'evt_number': [], 'beam_energy': [], 'eventdata_items': None, 'run_number': [], 'geometry': None, 'beam_type': [], 'file_guid': '10A1A6D0-98EF-DE11-8D70-003048C6617E', 'file_md5sum': 'bce350a81aa253cc7eb8385a62775938', 'lumi_block': [], 'conditions_tag': None, 'det_descr_tags': None, 'nentries': 0, 'metadata': None}
+        f10_ref = {'metadata_items': None, 'stream_names': ['TAG'], 'run_type': [], 'stream_tags': [], 'evt_type': [], 'tag_info': None, 'file_type': 'pool', 'file_name': 'root://castoratlas//castor/cern.ch/user/b/binet/utests/athfile/TAG.102229._000001.pool.root.1', 'evt_number': [25], 'beam_energy': [], 'eventdata_items': None, 'run_number': [142391], 'geometry': None, 'beam_type': [], 'file_guid': '10A1A6D0-98EF-DE11-8D70-003048C6617E', 'file_md5sum': 'bce350a81aa253cc7eb8385a62775938', 'lumi_block': [], 'conditions_tag': None, 'det_descr_tags': None, 'nentries': 71L, 'metadata': None}
 
         _compare_fileinfos(f10,f10_ref)
         assert f10.run_number==f10_ref['run_number']
