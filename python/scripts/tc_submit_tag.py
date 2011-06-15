@@ -267,7 +267,10 @@ def main(args):
     if args.release and len(args.release.split(',')) == 1:
         _release = args.release.split(',')[0]
         args.release = ','.join([_release]*len(pkg_list))
-
+        # adjust the project list too
+        if args.project and len(args.project.split(',')) == 1:
+            args.project = ','.join([args.project.split(',')[0]]*len(pkg_list))
+            
     # query project if release is known
     if args.release and not args.project:
         _releases = args.release.split(',')

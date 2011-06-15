@@ -9,6 +9,7 @@ __author__ = "Sebastien Binet"
 
 
 ### imports -------------------------------------------------------------------
+import os
 import PyUtils.acmdlib as acmdlib
 
 @acmdlib.command(name='tc.show-clients')
@@ -32,7 +33,9 @@ def main(args):
     if isinstance(pkgs, basestring):
         pkgs = [pkgs]
 
-    all_clients = []
+    from collections import defaultdict
+    all_clients = defaultdict(list)
+    
     for pkg in pkgs:
         print
         client.msg.info('showing clients of [%s]...', pkg)
@@ -42,19 +45,40 @@ def main(args):
         fpkg = pkg['packagePath']+pkg['packageName']
         if len(projects) > 1:
             client.msg.info('pkg [%s] exists in more than 1 project: %s ==> will use last one')
+        elif len(projects) < 1:
+            continue
         project = projects[-1]
         clients = client.get_clients(project, args.release, fpkg)
-        for n,v in clients:
-            print n, v
-            if ('-%s-'%project not in v) and v not in all_clients:
-                all_clients.append(v)
+        for full_name,v,rel,grp in clients:
+            if full_name.startswith('Projects/'):
+                # remove "meta" packages
+                continue
+            v = v.strip()
+            if os.path.basename(full_name) == v:
+                # filter out container packages
+                continue
+            if '-%s-'%project not in v:
+                all_clients[full_name].append(v)
         #client.msg.info('        tag= [%s]', tag)
 
+    _all_clients = dict(all_clients)
+    all_clients = []
+    for full_name in sorted(_all_clients.keys()):
+        v = _all_clients[full_name]
+        if len(v) > 1:
+            versions = client.get_version_of_pkg(full_name, args.release)
+            if len(versions) != 1:
+                client.msg.info('found multiple versions for package [%s]: %r',
+                                full_name, versions)
+                v = versions
+        print '%-40s' % v[0], full_name
+        all_clients.append(v[0])
+        
     rc = 0
     if args.co:
         print
         client.msg.info(":"*40)
-        client.msg.info(":: list of package versions to checkout:")
+        client.msg.info(":: list of package to checkout:")
         for c in all_clients:
             print c
         cmd = ['pkgco.py',]+all_clients
