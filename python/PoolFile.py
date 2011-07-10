@@ -193,7 +193,7 @@ class PoolFileCatalog(object):
         import re
         if url_or_fid.lower().startswith('fid:'):
             url_or_fid = url_or_fid[len('fid:'):]
-        if re.compile (r'\w{8}-\w{4}-\w{4}-\w{4}-\w{12}').match (url_or_fid):
+        if re.compile (r'\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$').match (url_or_fid):
             fid = url_or_fid.lower()
             # better to check consistency of catalog over all entries
             # than declare success on first match...
