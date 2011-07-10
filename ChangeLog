@@ -1,3 +1,9 @@
+2011-07-10  Paolo Calafiura  <calaf@localhost6.localdomain6>
+
+	* tagging PyUtils-00-10-87
+	* python/PoolFile.py (PoolFileCatalog._pfn): handle atlas_g4 trf case,
+	in which input files contain an fid-like string in name (#84085)
+
 2011-06-15  Sebastien Binet  <sebastien.binet@cern.ch>
 
 	* tagging PyUtils-00-10-86
