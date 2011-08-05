@@ -190,7 +190,7 @@ def avn_tag(args):
         if tag[0] == '@':
             tag = tag[1:]
         tag = mungtag(tag)
-    cmd_args[0:2] = ['cp', '.', tag]
+    cmd_args[0:2] = ['cp', avn.url, tag]
     return cmd_args
 
 def avn_lstags(args):
