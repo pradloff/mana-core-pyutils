@@ -1,3 +1,10 @@
+2011-08-05  Sebastien Binet  <binet@voatlas51.cern.ch>
+
+	* tagging PyUtils-00-10-50-11
+	* make sure to tag from either trunk or a branch instead of
+	  the local directory
+	* M bin/avn.py
+
 2011-05-25  Sebastien Binet  <sebastien.binet@cern.ch>
 
 	* tagging PyUtils-00-10-50-10
