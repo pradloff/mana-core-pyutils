@@ -37,13 +37,10 @@ def import_root(batch=True):
     >>> ROOT = import_root(batch=True)
     >>> f = ROOT.TFile.Open(...)
     """
-    import sys
-    if batch:
-        sys.argv.insert(1, '-b')
     import ROOT
     ROOT.gROOT.SetBatch(batch)
     if batch:
-        del sys.argv[1]
+        ROOT.PyConfig.IgnoreCommandLineOptions = True
     import PyCintex
     PyCintex.Cintex.Enable()
     return ROOT
