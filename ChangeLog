@@ -1,3 +1,9 @@
+2011-09-13  Graeme Stewart <graeme.andrew.stewart@cern.ch>
+
+    * tagging PyUtils-00-10-89
+    * Modify RootUtils.import_root() to not read command line arguments and set batch
+      mode without modifying sys.argv[]
+
 2011-08-05  Sebastien Binet  <binet@voatlas51.cern.ch>
 
 	* tagging PyUtils-00-10-88
