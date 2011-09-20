@@ -1,3 +1,10 @@
+2011-09-20  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-11-00
+	* update athfile ref-files for CASTOR->EOS migration
+	* added a xrootd/bs test
+	* M python/AthFile/tests.py
+
 2011-09-13  Graeme Stewart <graeme.andrew.stewart@cern.ch>
 
     * tagging PyUtils-00-10-89
