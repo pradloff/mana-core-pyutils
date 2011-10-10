@@ -953,16 +953,20 @@ class DiffFiles(object):
     terms of containers' content and containers' sizes
     """
 
-    def __init__(self, refFileName, chkFileName, verbose = False):
+    def __init__(self, refFileName, chkFileName, verbose = False, ignoreList = None):
         object.__init__(self)
 
         self.verbose = verbose
         refFileName = os.path.expandvars( os.path.expanduser( refFileName ) )
         chkFileName = os.path.expandvars( os.path.expanduser( chkFileName ) )
 
+        if ignoreList is None:
+            ignoreList = []
+            
         try:
             self.refFile = PoolFile( refFileName )
             self.chkFile = PoolFile( chkFileName )
+            self.ignList = sorted( ignoreList )
         except Exception, err:
             print "## Caught exception [%s] !!" % str(err.__class__)
             print "## What:",err
@@ -1022,7 +1026,12 @@ class DiffFiles(object):
             self.allGood = False
             pass
 
-        commonContent = [ d for d in chkNames if d in refNames ]
+        if len(self.ignList) > 0:
+                self.summary += [ "## Ignoring the following:" ]
+                for n in self.ignList:
+                    self.summary += [ "  %s" % n ]
+
+        commonContent = [ d for d in chkNames if (d in refNames and d not in self.ignList)]
 
         if not self.allGood:
             self.summary += [ "=" * 80 ]
