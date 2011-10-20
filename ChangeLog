@@ -1,4 +1,7 @@
-2011-10-19  Frank Winklmeier  <fwinkl@cern>
+2011-10-20  Frank Winklmeier  <fwinkl@cern>
+
+	* tagging PyUtils-00-11-03
+	* bin/tcSubmitTag.py: Make it an alias for acmd.py tc submit-tag
 
 	* tagging PyUtils-00-11-02
 	* M python/scripts/tc_submit_tag.py: Use latest SVN tag if none given; respect order of tags
