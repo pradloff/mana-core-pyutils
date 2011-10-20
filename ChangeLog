@@ -1,5 +1,8 @@
 2011-10-20  Frank Winklmeier  <fwinkl@cern>
 
+	* tagging PyUtils-00-11-04
+	* bin/tcSubmitTag.py: Remove deprecation warning
+	
 	* tagging PyUtils-00-11-03
 	* bin/tcSubmitTag.py: Make it an alias for acmd.py tc submit-tag
 
