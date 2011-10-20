@@ -1,3 +1,10 @@
+2011-10-19  Frank Winklmeier  <fwinkl@cern>
+
+	* tagging PyUtils-00-11-02
+	* M python/scripts/tc_submit_tag.py: Use latest SVN tag if none given; respect order of tags
+	  given on the command line; if one tag and multiple releases given submit same tag to all
+	* M python/acmdlib.py: Preserve formatting in sub-command description
+
 2011-10-10  Sebastien Binet  <sebastien.binet@cern.ch>
 
 	* tagging PyUtils-00-11-01
