@@ -21,6 +21,7 @@ __all__ = [
 import sys
 import extensions as ext_plugins
 import argparse
+import textwrap
 
 from PyUtils.decorator import decorator
 
@@ -78,7 +79,7 @@ class Command(object):
     @property
     def description(self):
         if getattr(self.fct, '__doc__', None):
-            return self.fct.__doc__
+            return textwrap.dedent(self.fct.__doc__)
 
     @property
     def add_argument(self):
@@ -91,6 +92,7 @@ class Command(object):
         """Create and register a subparser for this command."""
 
         kwargs.setdefault('help', self.help)
+        kwargs.setdefault('formatter_class',argparse.RawDescriptionHelpFormatter)
         kwargs.setdefault('description', self.description)
         kwargs.setdefault('name', self.name)
         names = (kwargs.get('name') or self.name).split('.')

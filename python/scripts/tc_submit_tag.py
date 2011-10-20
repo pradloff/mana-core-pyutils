@@ -16,6 +16,7 @@ import os.path as osp
 
 import PyUtils.acmdlib as acmdlib
 import PyUtils.AmiLib as amilib
+import PyCmt.Cmt as cmt
 
 ### functions -----------------------------------------------------------------
 
@@ -197,15 +198,16 @@ def submit_tag(client, args, pkg, tag):
 @acmdlib.argument(
     'pkgs',
     nargs='+',
+    metavar='TAG',
     help="""\
     (list of package) tags to submit or a file containing that list""")
 def main(args):
-    """Submit one or more TAGs to TagCollector.
+    """Submit one or more package tags to TagCollector.
 
-
-    TAG can be in one of two formats:
-     Container/Package-00-01-02
-     Package-00-01-02
+    TAG can be one of the following formats:
+      Container/Package-00-01-02
+      Package-00-01-02
+      Package --> will use latest package tag
 
     All submitted tags need approval via the TagCollector web interface.
     If several TAGs are given they will be submitted to the same release(s)
@@ -248,8 +250,8 @@ def main(args):
                     pkgs.append(l)
         else:
             pkgs.append(pkg)
-    pkgs = list(set(pkgs))
-    pkg_list = [client.find_pkg(pkg, cbk_fct=select_tag) for pkg in pkgs]
+
+    pkg_list = [client.find_pkg(pkg, cbk_fct=select_tag, check_tag=False) for pkg in pkgs]
 
     # setup history
     readline.set_history_length(10)
@@ -289,9 +291,16 @@ def main(args):
         else:
             args.project += ','+','.join(_projects)
         pass
-    
-    # query for missing options
+
+    # Find latest tag if needed
     print '-'*80
+    for p in pkg_list:
+        if not 'packageTag' in p:
+            pkg = (p['packagePath']+p['packageName']).strip('/') # CMTise path
+            p['packageTag'] = cmt.CmtWrapper().get_latest_pkg_tag(pkg)
+            print 'Using latest tag %s' % (p['packageTag'])
+
+    # query for missing options    
     for o in ('project', 'release', 'justification', 'savannah',):
         value = getattr(args, o)
         if value:
@@ -308,6 +317,9 @@ def main(args):
             (args.project, args.release)
             )
 
+    # If only one tag given, submit this tag to all releases
+    if len(pkg_list)==1: pkg_list = pkg_list*len(args.release)
+                    
     ok = False
     if valid_certificate():
         args.password = None
