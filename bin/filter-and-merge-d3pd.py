@@ -919,6 +919,18 @@ def extract_data_from_xml(fname="GRL.xml"):
         for lbrange in run_ranges: 
             lbn_min=lbrange['Start']
             lbn_max=lbrange['End']
+            # GRL schema changed from:
+            #  <LumiBlockCollection>
+            #     <Run>178044</Run>
+            #     <LBRange Start="42" End="666"/>
+            #    ...
+            # to:
+            #  <LumiBlockCollection>
+            #     <Run PrescaleRD0="8" PrescaleRD1="8">178044</Run>
+            #     <LBRange Start="42" End="666"/>
+            #    ...
+            if isinstance(runnumber, XmlDictObject):
+                runnumber = runnumber['_text']
             #print runnumber,"  ", lbn_min,"  ", lbn_max
             data.append((runnumber, lbn_min, lbn_max))
             pass
@@ -931,8 +943,8 @@ if __name__ == "__main__":
 """
 tests:
 
-xrdcp root://castoratlas//castor/cern.ch/user/b/binet/utests/utests/filter-d3pd/ntuple.0.root .
-xrdcp root://castoratlas//castor/cern.ch/user/b/binet/utests/utests/filter-d3pd/ntuple.1.root .
+xrdcp root://eosatlas//eos/atlas/user/b/binet/utests/utests/filter-d3pd/ntuple.0.root .
+xrdcp root://eosatlas//eos/atlas/user/b/binet/utests/utests/filter-d3pd/ntuple.1.root .
 cat > input.txt << EOF
 ntuple.0.root
 ntuple.1.root
