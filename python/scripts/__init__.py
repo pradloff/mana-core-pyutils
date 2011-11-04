@@ -15,6 +15,7 @@ acmdlib.register('gen-klass', 'PyUtils.scripts.gen_klass:main')
 #acmdlib.register('ami-dset', 'PyUtils.AmiLib:ami_dset')
 
 acmdlib.register('tc.find-pkg', 'PyUtils.scripts.tc_find_pkg:main')
+acmdlib.register('tc.find-tag', 'PyUtils.scripts.tc_find_tag:main')
 acmdlib.register('tc.submit-tag', 'PyUtils.scripts.tc_submit_tag:main')
 acmdlib.register('tc.show-clients', 'PyUtils.scripts.tc_show_clients:main')
 
