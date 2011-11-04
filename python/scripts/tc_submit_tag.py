@@ -202,7 +202,7 @@ def submit_tag(client, args, pkg, tag):
     help="""\
     (list of package) tags to submit or a file containing that list""")
 def main(args):
-    """Submit one or more package tags to TagCollector.
+    """submit one or more package tags to TagCollector
 
     TAG can be one of the following formats:
       Container/Package-00-01-02
@@ -228,6 +228,13 @@ def main(args):
     import PyUtils.AmiLib as amilib
     client = amilib.Client()
 
+    res = client.exec_cmd(cmd='TCSearchPackageVersion', args={'keyword':'HLToks',
+                                                        'groupName' : 'AtlasP1HLT',
+                                                        'releaseName' : '16.1.3.18',
+                                                        'withDep' :''
+                                                        })
+    print amilib.ami_todict(res)['AMIMessage']['Result']
+    return
 
     def select_tag():
         value = raw_input('Please select (q to quit): ')

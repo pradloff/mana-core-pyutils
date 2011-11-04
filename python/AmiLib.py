@@ -115,7 +115,7 @@ def xmlstr_todict(s):
     import PyUtils.xmldict as _x
     import xml.etree.cElementTree as ET
     return  _x.xml2dict(ET.fromstring(s))
-    
+
 ### classes -------------------------------------------------------------------
 class Client(object):
 
@@ -358,10 +358,63 @@ class Client(object):
                     "no version found for package [%s] and release [%s]",
                     full_pkg_name,
                     release)
-        except amilib.PyAmi.AMI_Error, err:
+        except PyAmi.AMI_Error, err:
             pass
         return versions
 
+
+    def get_version_of_pkg_with_deps(self, pkg, project, release):
+        """
+        retrieve the package version from AMI taken into account project dependencies
+        """
+        
+        versions = []
+        try:
+            res = self.exec_cmd(cmd='TCSearchPackageVersion',
+                                keyword=pkg,
+                                groupName=project,
+                                withDep=True,
+                                releaseName=release)
+            d = ami_todict(res)['AMIMessage']['Result']
+            rows = d['rowset'].get('row',[])
+            if isinstance(rows, dict):
+                rows = [rows]
+
+            for row in rows:
+                fields = row['field']
+                packageTag = None
+                fullPackageName = None
+                groupName = None
+                releaseName = None
+                for f in fields:
+                    if f['name'] == 'fullPackageName':
+                        fullPackageName = f['_text']
+                    elif f['name'] == 'packageTag':
+                        packageTag = f['_text']
+                    elif f['name'] == 'releaseName':
+                        releaseName = f['_text']
+                    elif f['name'] == 'groupName':
+                        groupName = f['_text']
+
+                versions.append((groupName,releaseName,fullPackageName,packageTag))
+                
+            # If more than one result, match full package name
+            if len(versions)>1:
+                pkg = self.find_pkg(pkg, check_tag=False)
+                full_pkg_name = pkg['packagePath']+pkg['packageName']
+                versions = filter(lambda v:v[2]==full_pkg_name, versions)
+
+            if len(versions)==0:
+                self.msg.error(
+                    "no version found for package [%s] and release [%s]",
+                    pkg,
+                    release)
+
+        except PyAmi.AMI_Error, err:
+            pass
+            
+        return versions
+    
     def get_project_tree(self, project, release, recursive=False):
         """return the dependency tree of packages for a given project
         and a given release
@@ -398,8 +451,11 @@ class Client(object):
                     )
             out = out[k]
         return out
-        
+
     def get_open_releases(self, project):
+        return self.get_releases(project, lambda x : x!='terminated')
+        
+    def get_releases(self, project, relStatusCond=lambda x : True):        
         """return the list of open releases for a given ``project``"""
         args = {
            'groupName' : project,
@@ -415,21 +471,13 @@ class Client(object):
         rxml = result.transform('xml')
         import xml.etree.cElementTree as ET
    
-        # Definition of available releases depends on project
-        # if project in ["AtlasP1HLT","AtlasTier0"]:
-        #    cond = lambda x: x.get("status")!="terminated"
-        # else:
-        #   cond = lambda x: x.get("status")!="terminated" and
-        #                    x.get("tagApprovalMode")=="tagApproval"
-
-        cond = lambda x: x.get("status")!="terminated"
         try:
             reltree = ET.fromstring(
                 rxml
                 ).find("Result").find("tree")
             releases = [ r.get("releaseName") 
                          for r in reltree.getiterator("treeBranch") 
-                         if cond(r) ]
+                         if relStatusCond(r.get("status")) ]
 
             # Filter all special purpose releases (e.g. -MIG, -SLHC)
             releases = filter(lambda x: x.count("-")==0, releases)
@@ -439,6 +487,8 @@ class Client(object):
                 'Could not parse result of TCFormGetReleaseTreeDevView:\n%s' % rxml
                 )
 
+        # Sort by release number
+        releases.sort(key=lambda x: [int(y) if y.isdigit() else 0 for y in x.split('.')])
         return releases
 
     def get_clients(self, project, release, full_pkg_name):
