@@ -228,14 +228,6 @@ def main(args):
     import PyUtils.AmiLib as amilib
     client = amilib.Client()
 
-    res = client.exec_cmd(cmd='TCSearchPackageVersion', args={'keyword':'HLToks',
-                                                        'groupName' : 'AtlasP1HLT',
-                                                        'releaseName' : '16.1.3.18',
-                                                        'withDep' :''
-                                                        })
-    print amilib.ami_todict(res)['AMIMessage']['Result']
-    return
-
     def select_tag():
         value = raw_input('Please select (q to quit): ')
         if value.lower() == 'q':

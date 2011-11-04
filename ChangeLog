@@ -1,5 +1,8 @@
 2011-11-04  Frank Winklmeier  <fwinkl@cern>
 
+	* tagging PyUtils-00-11-07
+	* python/scripts/tc_submit_tag.py: Remove accidentally comitted debugging code
+
 	* tagging PyUtils-00-11-06
 	* A python/scripts/tc_find_tag.py: new acmd to find TC package version
 	* M python/scripts/__init__.py: Register tc_find_tag
