@@ -1,3 +1,9 @@
+2011-11-08  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-11-08
+	* obo Peter vG: adjust to the new DataHeader placement
+	* M python/PoolFile.py
+
 2011-11-04  Frank Winklmeier  <fwinkl@cern>
 
 	* tagging PyUtils-00-11-07
