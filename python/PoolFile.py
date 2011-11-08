@@ -399,7 +399,7 @@ class PoolOpts(object):
     FAST_MODE   = False
     SUPER_DETAILED_BRANCH_SZ = False
     READ_MODE   = "READ"
-    POOL_HEADER = "POOLContainer_"
+    POOL_HEADER = "POOLContainer"
     EVENT_DATA  = "CollectionTree"
     META_DATA   = "MetaData"
     HDR_FORMAT  = "  %11s     %11s     %11s      %11s  %5s  %s"
@@ -412,7 +412,8 @@ class PoolOpts(object):
 
     @classmethod
     def isDataHeader(cls, name):
-        return name == PoolOpts.POOL_HEADER+"DataHeader"
+        return ( name == PoolOpts.POOL_HEADER ) or \
+               ( name == PoolOpts.POOL_HEADER+"_DataHeader" )
 
     @classmethod
     def isEventData(cls, name):
@@ -618,12 +619,17 @@ class PoolFile(object):
 
     def __processFile(self):
         ## first we try to fetch the DataHeader
-        name  = PoolOpts.POOL_HEADER + "DataHeader"
+        name  = PoolOpts.POOL_HEADER
         dhKey = self.poolFile.FindKey( name )
         if dhKey:
             nEntries = dhKey.ReadObj().GetEntries()
         else:
-            nEntries = 0
+            name  = PoolOpts.POOL_HEADER + "_DataHeader"
+            dhKey = self.poolFile.FindKey( name )
+            if dhKey:
+                nEntries = dhKey.ReadObj().GetEntries()
+            else:
+                nEntries = 0
 
         keys = []
         containers = []
@@ -647,7 +653,10 @@ class PoolFile(object):
                 continue
 
             if PoolOpts.isDataHeader(name):
-                contName     = name.replace( PoolOpts.POOL_HEADER, "" )
+                if name == PoolOpts.POOL_HEADER:
+                    contName     = "DataHeader"
+                else:
+                    contName     = name.replace(PoolOpts.POOL_HEADER+"_", "" )
                 memSize      = tree.GetTotBytes() / Units.kb
                 diskSize     = tree.GetZipBytes() / Units.kb
                 memSizeNoZip = 0.0
