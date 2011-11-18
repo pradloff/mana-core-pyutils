@@ -30,11 +30,16 @@ __author__ = "Sebastien Binet"
 import sys
 import os
 import commands
+import re
 import string
 import subprocess
 
 tagchars = string.ascii_letters + string.digits + '-'
 
+# patterns taken from atlas svn-hooks...
+_is_tag_name_valid_tc = re.compile("(^[A-Za-z_]+-[A-Za-z_]+-[0-9]{2}-[0-9]{2}-[0-9]{2}$)|(^[A-Za-z_]+-[A-Za-z_]+-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}$)").match
+_is_tag_name_valid =    re.compile("(^[A-Za-z0-9_]+-[0-9]{2}-[0-9]{2}-[0-9]{2}$)|(^[A-Za-z0-9_]+-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}$)").match
+        
 class AvnObject(object):
     """dummy object to hold options and variables
     """
@@ -185,12 +190,26 @@ def avn_help():
 
 def avn_tag(args):
     cmd_args = args[:]
-    tag = cmd_args[1]
-    if tag.find(':') < 0:
-        if tag[0] == '@':
-            tag = tag[1:]
-        tag = mungtag(tag)
-    cmd_args[0:2] = ['cp', avn.url, tag]
+    found_tag = False
+    for i,tag in enumerate(cmd_args):
+        if tag[0] == '-':
+            if tag.startswith(('-r', '--revision')):
+                has_r_switch = True
+            continue
+        if tag.find(':') < 0:
+            if tag[0] == '@':
+                tag = tag[1:]
+            
+            if _is_tag_name_valid(tag):
+                tag = mungtag(tag)
+                cmd_args[i] = tag
+                pass
+            pass
+        pass
+    if not found_tag:
+        raise RuntimeError('could not find a tag in arguments: \'%s\'' %
+                           ' '.join(cmd_args))
+    cmd_args = ['cp', avn.url,] + cmd_args[1:]
     return cmd_args
 
 def avn_lstags(args):
