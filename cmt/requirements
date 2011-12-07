@@ -78,6 +78,7 @@ apply_pattern declare_scripts files="\
  diff-jobo-cfg.py \
  filter-and-merge-d3pd.py \
  lstags \
+ atl-gen-athena-d3pd-reader \
 "
  
 end_private
