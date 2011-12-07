@@ -1,0 +1,411 @@
+#!/usr/bin/env python
+
+#------------
+# std imports
+import os
+import sys
+import textwrap
+
+# 3rd-party imports
+# delay ROOT import as it is quite slow...
+ROOT = None
+
+def _is_object_metadata(n):
+    sz = ROOT.D3PD.ObjectMetadata.RANDOM_NAME_POSTFIX_LENGTH+1
+    return len(n) > sz and \
+           n[-sz] == "_"
+
+def collect_objects(d, objs):
+    for k in d.GetListOfKeys():
+        if k.GetClassName() != "TObjString":
+            continue
+        if not _is_object_metadata(k.GetName()):
+            continue
+        obj_name = ROOT.D3PD.ObjectMetadata.objectName(k.GetName())
+        print " >",obj_name
+        # access the variable description
+        kk = "%s;%d"%(k.GetName(), k.GetCycle())
+        ostr = d.Get(kk)
+        if not ostr:
+            print "** could not access key [%s]" % kk
+            return 1
+        #print ostr,type(ostr)
+        md = ROOT.D3PD.RootObjectMetadata()
+        md.setName(obj_name)
+        if not md.read(ostr.GetString().Data()).isSuccess():
+            print "** problem reading metadata for [%s]" % kk
+            return 1
+
+        if not md.checkPrefixes().isSuccess():
+            print "** could not fix prefixes for metadata with name [%s]" % md.name()
+            return 1
+        
+        if md.name() in objs:
+            objs[md.name()].merge(md)
+        else:
+            objs[md.name()] = md
+        pass # keys
+    return 0
+
+
+def merge_objects(objs):
+    res = {}
+    for o in objs:
+        n = o.name()
+        if n in res:
+            res[n].setName(n)
+            res[n].setPrefix(o.prefix())
+            res[n].setContainer(o.container())
+            res[n].merge(o)
+        else:
+            res[n] = o
+            pass
+    return res.values()
+
+def normalize_type(n):
+    tcle = ROOT.TClassEdit
+    return tcle.ShortType(n, tcle.kDropDefaultAlloc)
+
+def normalize_fct_ret_type(n):
+    tcle = ROOT.TClassEdit
+    n = normalize_type(n)
+    ret= tcle.ShortType(n, tcle.kDropDefaultAlloc|tcle.kInnerClass)
+    if tcle.IsSTLCont(ret):
+        return 'const %s&' % ret
+    return ret
+
+def gen_varname(n):
+    n = n.replace(" ", "_").replace(":","_")
+    return "m_"+n
+
+def gen_fctname(n):
+    n = n.replace(" ", "_").replace(":","_")
+    if n[0].isdigit():
+        n = "x"+n
+    return n
+
+def gen_header(clsname, outdir, obj):
+    fname = os.path.join(outdir, clsname+".h")
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
+        pass
+
+    # file already exists...
+    if os.path.exists(fname):
+        return
+    
+    f = open(fname, "w")
+    vardict = {
+        'classname' : clsname,
+        'CLASSNAME': clsname.upper(),
+        'decl_element_class': '',
+        }
+
+    cls_vars = []
+    cls_fcts = []
+    ovars = ROOT.D3PDMakerReaderDict.to_vector(obj.variables())
+
+    for v in ovars:
+        if v.doc():
+            fmt = "%(indent)s /// %(cls_var_doc)s"
+            cls_vars.append(fmt % {
+                'indent': " "*2,
+                'cls_var_doc': v.doc(),
+                })
+            cls_fcts.append(fmt % {
+                'indent': " "*2,
+                'cls_var_doc': v.doc(),
+                })
+            pass
+        
+        fmt = "%(indent)s %(cls_var_type)s* %(cls_var_name)s;"
+        cls_vars.append(fmt % {
+            'indent': " "*2,
+            'cls_var_type': normalize_type(v.type()),
+            'cls_var_name': gen_varname(v.name()),
+            })
+
+        tcle = ROOT.TClassEdit
+        is_cont = tcle.IsSTLCont(v.type())
+        fmt = "%(indent)s %(cls_fct_type)s %(cls_fct_name)s(%(cls_fct_args)s) const;"
+        cls_fcts.append(fmt % {
+            'indent': " "*2,
+            'cls_fct_type': normalize_fct_ret_type(v.type()),
+            'cls_fct_name': gen_fctname(v.name()),
+            'cls_fct_args': '' if not is_cont else 'std::size_t idx',
+            })
+        pass
+    vardict['class_vars'] = '\n'.join(cls_vars)
+    vardict['class_fcts'] = '\n'.join(cls_fcts)
+    vardict['class-prefix'] = obj.prefix()
+    print >> f, textwrap.dedent(
+'''\
+// dear emacs, this is -*- c++ -*-
+#ifndef ATH_D3PDREADER_%(CLASSNAME)s_H
+#define ATH_D3PDREADER_%(CLASSNAME)s_H 1
+
+// stl includes
+#include <map>
+#include <vector>
+#include <string>
+
+// fwk includes
+#include "GaudiKernel/ServiceHandle.h"
+#include "StoreGate/StoreGateSvc.h"
+
+// fwd declarations
+class %(classname)s;
+
+class %(classname)s
+{
+   typedef ServiceHandle<StoreGateSvc> StoreGateSvc_t;
+public:
+   %(classname)s(const StoreGateSvc_t& svc = StoreGateSvc_t("StoreGateSvc", "%(classname)s"),
+                 const std::string& prefix = "%(class-prefix)s");
+
+   /// retrieve data from the store
+   StatusCode retrieve() const;
+
+   /// retrieve data from the store
+   StatusCode retrieve();
+
+   /// change prefix
+   void setPrefix(const std::string& prefix)
+   { m_prefix = prefix; }
+
+   /// return prefix
+   const std::string& prefix() const
+   { return m_prefix; }
+   
+public:
+%(class_fcts)s
+
+private:
+   std::string m_prefix;
+   mutable StoreGateSvc_t m_store;
+   
+%(class_vars)s
+}; // %(classname)s
+
+#endif /* not ATH_D3PDREADER_%(CLASSNAME)s_H */
+'''
+        % vardict)
+
+    f.flush()
+    return
+
+def gen_source(clsname, outdir, obj):
+    fname = os.path.join(outdir, clsname+".cxx")
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
+        pass
+
+    # file already exists...
+    if os.path.exists(fname):
+        return
+    
+    f = open(fname, "w")
+    vardict = {
+        'classname' : clsname,
+        'CLASSNAME': clsname.upper(),
+        'ctor-impl': '',
+        'retrieve-const': '',
+        'retrieve-non-const': '',
+        'cls-fcts-impl': '',
+        }
+
+    ctor_impl = ['%(classname)s::%(classname)s(const ServiceHandle<StoreGateSvc>& store, const std::string& prefix)' % vardict,
+                 '   : m_prefix(prefix)',
+                 '   , m_store(store)']
+    retr_const = [
+        'StatusCode',
+        '%(classname)s::retrieve() const' % vardict,
+        '{',
+        ]
+    
+    retr_non_const = [
+        'StatusCode',
+        '%(classname)s::retrieve()' % vardict,
+        '{',
+        ]
+
+    cls_fcts_impl = []
+    
+    cls_vars = []
+    cls_fcts = []
+    ovars = ROOT.D3PDMakerReaderDict.to_vector(obj.variables())
+
+    for v in ovars:
+        ctor_impl.append('   , %s(NULL)' % gen_varname(v.name()))
+
+        snippet = textwrap.dedent(
+            '''\
+            %(indent)s {
+            %(indent)s   std::string key = m_prefix + "%(cls_var_name_str)s";
+            %(indent)s   if (m_store->contains<%(cls_var_type)s >(key)) {
+            %(indent)s      if (!m_store->retrieve((const %(cls_var_type)s*&)%(cls_var_name)s, key).isSuccess()) {
+            %(indent)s         return StatusCode::FAILURE;
+            %(indent)s      }
+            %(indent)s   }
+            %(indent)s }
+            ''' )
+                
+        retr_const.append(snippet % {
+            'indent': " "*2,
+            'cls_var_type': normalize_type(v.type()),
+            'cls_var_name': gen_varname(v.name()),
+            'cls_var_name_str': v.name(),
+            })
+
+        snippet = textwrap.dedent(
+            '''\
+            %(indent)s {
+            %(indent)s   std::string key = m_prefix + "%(cls_var_name_str)s";
+            %(indent)s   if (m_store->contains<%(cls_var_type)s >(key)) {
+            %(indent)s      if (!m_store->retrieve((%(cls_var_type)s*&)%(cls_var_name)s, key).isSuccess()) {
+            %(indent)s         return StatusCode::FAILURE;
+            %(indent)s      }
+            %(indent)s   }
+            %(indent)s }
+            ''' )
+        retr_non_const.append(snippet % {
+            'indent': " "*2,
+            'cls_var_type': normalize_type(v.type()),
+            'cls_var_name': gen_varname(v.name()),
+            'cls_var_name_str': v.name(),
+            })
+
+        tcle = ROOT.TClassEdit
+        is_cont = tcle.IsSTLCont(v.type())
+        
+        snippet = textwrap.dedent(
+            '''\
+            %(cls_fct_type)s
+            %(classname)s::%(cls_fct_name)s(%(cls_fct_args)s) const
+            {
+              return %(do_deref)sthis->%(cls_var_name)s%(cls_fct_args_body)s;
+            }
+            ''' % {
+            'indent': " "*2,
+            'classname': clsname,
+            'do_deref': '' if is_cont else '*',
+            'cls_fct_type': normalize_fct_ret_type(v.type()),
+            'cls_fct_name': gen_fctname(v.name()),
+            'cls_fct_args': '' if not is_cont else 'std::size_t idx',
+            'cls_fct_args_body': '' if not is_cont else '->at(idx)',
+            'cls_var_name': gen_varname(v.name()),
+            })
+        cls_fcts_impl.append(snippet)
+        pass
+
+    ctor_impl.append("{}\n")
+    retr_const.append("  return StatusCode::SUCCESS;\n}\n");
+    retr_non_const.append("  return StatusCode::SUCCESS;\n}\n");
+
+    vardict['class_vars'] = '\n'.join(cls_vars)
+    vardict['class_fcts'] = '\n'.join(cls_fcts)
+
+    vardict['ctor-impl'] = '\n'.join(ctor_impl)
+    vardict['retrieve-const'] = '\n'.join(retr_const)
+    vardict['retrieve-non-const'] = '\n'.join(retr_non_const)
+    vardict['cls-fcts-impl'] = '\n'.join(cls_fcts_impl)
+    
+    print >> f, textwrap.dedent(
+'''\
+// dear emacs, this is -*- c++ -*-
+// stl includes
+#include <map>
+#include <vector>
+#include <string>
+
+// fwk includes
+#include "GaudiKernel/ServiceHandle.h"
+#include "StoreGate/StoreGateSvc.h"
+#include "SGTools/BuiltinsClids.h"  // to put/get builtins into/from storegate
+#include "SGTools/StlVectorClids.h" // similarly for vectors
+
+// pkg includes
+#include "%(classname)s.h"
+
+/// constructor for %(classname)s
+%(ctor-impl)s
+
+/// retrieve data from store
+%(retrieve-const)s
+
+/// retrieve data from store
+%(retrieve-non-const)s
+
+//@{ accessors implementation
+%(cls-fcts-impl)s
+//@}
+'''
+        % vardict)
+
+    f.flush()
+    return
+
+
+def process(fnames, output):
+    import PyCintex; PyCintex.Cintex.Enable()
+    global ROOT
+    import PyUtils.RootUtils as ru
+    ROOT = ru.import_root(batch=True)
+
+    objects = {}
+    for fname in fnames:
+        print ":: processing [%s]..." % fname
+        f = ROOT.TFile.Open(fname)
+        if not f or f.IsZombie():
+            print ":: could not open [%s]" % fname
+            return 1
+
+        # collect metadata directories
+        metadirs = []
+        for k in f.GetListOfKeys():
+            if "Meta" in k.GetName() and k.GetClassName() == "TDirectoryFile":
+                metadirs.append(k.GetName())
+
+        print "-- metadirs:",metadirs
+
+        # collect object metadata for each of these directories
+        for dname in metadirs:
+            d = f.GetDirectory(dname)
+            if not d:
+                print "** could not get directory [%s]" % dname
+                return 1
+            sc = collect_objects(d, objects)
+            if sc:
+                print "** could not collect objects for [%s]" % dname
+                return sc
+
+    merged_objs = merge_objects(objects.values())
+
+    # generate the sources for each object
+    for obj in merged_objs:
+        ovars = ROOT.D3PDMakerReaderDict.to_vector(obj.variables())
+        #print "--",obj.name(), len(obj.variables()), [v.name() for v in ovars]
+
+        # generate the header...
+        if gen_header(obj.name(), output, obj):
+            print "** pb while generating header for [%s]" % obj.name()
+            return 1
+
+        # generate sources
+        if gen_source(obj.name(), output, obj):
+            print "** pb while generating source for [%s]" % obj.name()
+            return 1
+            
+    return 0
+
+def main():
+    fname = sys.argv[1]
+    print ":: generating d3pd-reader from [%s]..." % fname
+    process([fname], "code")
+    return 0
+
+
+if __name__ == "__main__":
+    sc = main()
+    sys.exit(sc)
+    

@@ -1,3 +1,9 @@
+2011-12-08  Sebastien Binet  <binet@voatlas51.cern.ch>
+
+	* tagging PyUtils-00-11-10
+	* first stab at a d3pd-reader generator code for athena
+	* A bin/atl-gen-athena-d3pd-reader
+
 2011-11-18  Sebastien Binet  <sebastien.binet@cern.ch>
 
 	* tagging PyUtils-00-11-09
