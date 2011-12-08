@@ -74,6 +74,18 @@ def normalize_fct_ret_type(n):
         return 'const %s&' % ret
     return ret
 
+def normalize_fct_ref_type(n):
+    tcle = ROOT.TClassEdit
+    n = normalize_type(n)
+    ret= tcle.ShortType(n, tcle.kDropDefaultAlloc|tcle.kInnerClass)
+    return ret
+
+def _is_vect_of_vect(n):
+    tcle = ROOT.TClassEdit
+    n = normalize_type(n)
+    ret= tcle.ShortType(n, tcle.kDropDefaultAlloc|tcle.kInnerClass)
+    return tcle.IsSTLCont(ret)
+    
 def gen_varname(n):
     n = n.replace(" ", "_").replace(":","_")
     return "m_"+n
@@ -104,7 +116,8 @@ def gen_header(clsname, outdir, obj):
     cls_vars = []
     cls_fcts = []
     ovars = ROOT.D3PDMakerReaderDict.to_vector(obj.variables())
-
+    vardict['add-obj-arg'] = ', std::size_t idx' if obj.container() else ''
+    
     for v in ovars:
         if v.doc():
             fmt = "%(indent)s /// %(cls_var_doc)s"
@@ -127,10 +140,15 @@ def gen_header(clsname, outdir, obj):
 
         tcle = ROOT.TClassEdit
         is_cont = tcle.IsSTLCont(v.type())
-        fmt = "%(indent)s %(cls_fct_type)s %(cls_fct_name)s(%(cls_fct_args)s) const;"
-        cls_fcts.append(fmt % {
+        snippet = textwrap.dedent(
+            '''\
+            %(indent)s %(cls_fct_type)s  %(cls_fct_name)s(%(cls_fct_args)s) const;
+            %(indent)s %(cls_fct_ref_type)s& %(cls_fct_name)s(%(cls_fct_args)s);
+            ''')
+        cls_fcts.append(snippet % {
             'indent': " "*2,
             'cls_fct_type': normalize_fct_ret_type(v.type()),
+            'cls_fct_ref_type': normalize_fct_ref_type(v.type()),
             'cls_fct_name': gen_fctname(v.name()),
             'cls_fct_args': '' if not is_cont else 'std::size_t idx',
             })
@@ -160,14 +178,20 @@ class %(classname)s
 {
    typedef ServiceHandle<StoreGateSvc> StoreGateSvc_t;
 public:
-   %(classname)s(const StoreGateSvc_t& svc = StoreGateSvc_t("StoreGateSvc", "%(classname)s"),
-                 const std::string& prefix = "%(class-prefix)s");
+   %(classname)s(const std::string& prefix = "%(class-prefix)s",
+                 const StoreGateSvc_t& svc = StoreGateSvc_t("StoreGateSvc", "%(classname)s"));
 
    /// retrieve data from the store
    StatusCode retrieve() const;
 
    /// retrieve data from the store
    StatusCode retrieve();
+
+   /// record data into the store
+   StatusCode record();
+
+   /// add an entry from another object
+   void add_object(const %(classname)s& o, std::size_t idx);
 
    /// change prefix
    void setPrefix(const std::string& prefix)
@@ -176,7 +200,12 @@ public:
    /// return prefix
    const std::string& prefix() const
    { return m_prefix; }
-   
+
+   /// allocate a brain new instance
+   static
+   %(classname)s create(const std::string& prefix,
+                        const StoreGateSvc_t& svc = StoreGateSvc_t("StoreGateSvc", "%(classname)s"));
+                        
 public:
 %(class_fcts)s
 
@@ -207,16 +236,27 @@ def gen_source(clsname, outdir, obj):
     f = open(fname, "w")
     vardict = {
         'classname' : clsname,
-        'CLASSNAME': clsname.upper(),
+        'CLASSNAME': clsname.upper(),        
         'ctor-impl': '',
+        'factory-impl': '',
+        'record-impl': '',
         'retrieve-const': '',
         'retrieve-non-const': '',
+        'add-obj-impl': '',
         'cls-fcts-impl': '',
         }
 
-    ctor_impl = ['%(classname)s::%(classname)s(const ServiceHandle<StoreGateSvc>& store, const std::string& prefix)' % vardict,
+    ctor_impl = ['%(classname)s::%(classname)s(const std::string& prefix, const ServiceHandle<StoreGateSvc>& store)' % vardict,
                  '   : m_prefix(prefix)',
                  '   , m_store(store)']
+    factory_impl = [
+        '/// allocate a brain new instance',
+        '%(classname)s' % vardict,
+        '%(classname)s::create(const std::string& prefix, const StoreGateSvc_t& svc)' % vardict,
+        '{',
+        '  %(classname)s o(prefix, svc);' % vardict,
+        ]
+    
     retr_const = [
         'StatusCode',
         '%(classname)s::retrieve() const' % vardict,
@@ -229,14 +269,47 @@ def gen_source(clsname, outdir, obj):
         '{',
         ]
 
+    record_impl = [
+        'StatusCode',
+        '%(classname)s::record()' % vardict,
+        '{',
+        ]
+
+    add_obj_impl = []
     cls_fcts_impl = []
     
     cls_vars = []
     cls_fcts = []
     ovars = ROOT.D3PDMakerReaderDict.to_vector(obj.variables())
 
-    for v in ovars:
+    if len([v for v in ovars if v.type().startswith('std::vector')]):
+        add_obj_impl = [
+            'void',
+            '%(classname)s::add_object(const %(classname)s& o, std::size_t idx)' % vardict,
+            '{',
+            ]
+    else:
+        add_obj_impl = [
+            'void',
+            '%(classname)s::add_object(const %(classname)s& o, std::size_t /*idx*/)' % vardict,
+            '{',
+            ]
+
+    add_obj_impl_nidx = []
+    add_obj_impl_vidx = None
+    for ii,v in enumerate(ovars):
         ctor_impl.append('   , %s(NULL)' % gen_varname(v.name()))
+
+        snippet = textwrap.dedent(
+            '''\
+            %(indent)s o.%(cls_var_name)s = new %(cls_var_type)s(0);
+            '''
+            )
+        factory_impl.append(snippet % {
+            'indent': " "*2,
+            'cls_var_type': normalize_type(v.type()),
+            'cls_var_name': gen_varname(v.name()),
+            })
 
         snippet = textwrap.dedent(
             '''\
@@ -275,6 +348,22 @@ def gen_source(clsname, outdir, obj):
             'cls_var_name_str': v.name(),
             })
 
+        snippet = textwrap.dedent(
+            '''\
+            %(indent)s {
+            %(indent)s   std::string key = m_prefix + "%(cls_var_name_str)s";
+            %(indent)s   if (!m_store->record((%(cls_var_type)s*&)%(cls_var_name)s, key).isSuccess()) {
+            %(indent)s      return StatusCode::FAILURE;
+            %(indent)s   }
+            %(indent)s }
+            ''' )
+        record_impl.append(snippet % {
+            'indent': " "*2,
+            'cls_var_type': normalize_type(v.type()),
+            'cls_var_name': gen_varname(v.name()),
+            'cls_var_name_str': v.name(),
+            })
+
         tcle = ROOT.TClassEdit
         is_cont = tcle.IsSTLCont(v.type())
         
@@ -285,29 +374,80 @@ def gen_source(clsname, outdir, obj):
             {
               return %(do_deref)sthis->%(cls_var_name)s%(cls_fct_args_body)s;
             }
+
+            %(cls_fct_ref_type)s&
+            %(classname)s::%(cls_fct_name)s(%(cls_fct_args)s)
+            {
+              return %(do_deref)sthis->%(cls_var_name)s%(cls_fct_args_body)s;
+            }
             ''' % {
             'indent': " "*2,
             'classname': clsname,
             'do_deref': '' if is_cont else '*',
             'cls_fct_type': normalize_fct_ret_type(v.type()),
+            'cls_fct_ref_type': normalize_fct_ref_type(v.type()),
             'cls_fct_name': gen_fctname(v.name()),
             'cls_fct_args': '' if not is_cont else 'std::size_t idx',
             'cls_fct_args_body': '' if not is_cont else '->at(idx)',
             'cls_var_name': gen_varname(v.name()),
             })
         cls_fcts_impl.append(snippet)
+
+        # ignore the container size variable
+        if not (v.name() in ('N', 'n')):
+            if is_cont:
+                add_obj_impl_vidx = ii
+                snippet = textwrap.dedent(
+                    '''\
+                    %(indent)sthis->%(cls_var_name)s->push_back(o.%(cls_var_name)s->at(idx));
+                    ''' % {
+                        'indent': " "*2,
+                        'classname': clsname,
+                        'cls_var_name': gen_varname(v.name()),
+                        })
+            else:
+                snippet = textwrap.dedent(
+                    '''\
+                    %(indent)s*this->%(cls_var_name)s = *o.%(cls_var_name)s;
+                    ''' % {
+                        'indent': " "*2,
+                        'cls_var_name': gen_varname(v.name()),
+                        })
+            add_obj_impl.append(snippet)
+        else:
+            add_obj_impl_nidx.append(ii)
         pass
 
+    for ii in add_obj_impl_nidx:
+        v = ovars[ii]
+        vv= ovars[add_obj_impl_vidx]
+        snippet = textwrap.dedent(
+            '''\
+            %(indent)s*this->%(cls_var_name)s = this->%(cls_var_name_v)s->size();
+            ''' % {
+                'indent': " "*2,
+                'cls_var_name': gen_varname(v.name()),
+                'cls_var_name_v': gen_varname(vv.name()),
+                })
+        add_obj_impl.append(snippet)
+        pass
+        
     ctor_impl.append("{}\n")
+    factory_impl.append("  return o;\n}\n")
     retr_const.append("  return StatusCode::SUCCESS;\n}\n");
     retr_non_const.append("  return StatusCode::SUCCESS;\n}\n");
+    record_impl.append("  return StatusCode::SUCCESS;\n}\n");
+    add_obj_impl.append("  return;\n}\n");
 
     vardict['class_vars'] = '\n'.join(cls_vars)
     vardict['class_fcts'] = '\n'.join(cls_fcts)
 
     vardict['ctor-impl'] = '\n'.join(ctor_impl)
+    vardict['factory-impl'] = '\n'.join(factory_impl)
     vardict['retrieve-const'] = '\n'.join(retr_const)
     vardict['retrieve-non-const'] = '\n'.join(retr_non_const)
+    vardict['record-impl'] = '\n'.join(record_impl)
+    vardict['add-obj-impl'] = '\n'.join(add_obj_impl)
     vardict['cls-fcts-impl'] = '\n'.join(cls_fcts_impl)
     
     print >> f, textwrap.dedent(
@@ -330,11 +470,20 @@ def gen_source(clsname, outdir, obj):
 /// constructor for %(classname)s
 %(ctor-impl)s
 
+/// factory
+%(factory-impl)s
+
 /// retrieve data from store
 %(retrieve-const)s
 
 /// retrieve data from store
 %(retrieve-non-const)s
+
+/// record data into the store
+%(record-impl)s
+
+/// populate object from a slice of another
+%(add-obj-impl)s
 
 //@{ accessors implementation
 %(cls-fcts-impl)s
