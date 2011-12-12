@@ -190,7 +190,6 @@ def avn_help():
 
 def avn_tag(args):
     cmd_args = args[:]
-    found_tag = False
     for i,tag in enumerate(cmd_args):
         if tag[0] == '-':
             if tag.startswith(('-r', '--revision')):
@@ -206,9 +205,6 @@ def avn_tag(args):
                 pass
             pass
         pass
-    if not found_tag:
-        raise RuntimeError('could not find a tag in arguments: \'%s\'' %
-                           ' '.join(cmd_args))
     cmd_args = ['cp', avn.url,] + cmd_args[1:]
     return cmd_args
 

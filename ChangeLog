@@ -1,5 +1,9 @@
 2011-12-12  Sebastien Binet  <sebastien.binet@cern.ch>
 
+	* tagging PyUtils-00-11-13
+	* fix avn-tag
+	* M bin/avn.py
+
 	* tagging PyUtils-00-11-12
 	* support for manacore
 	* M python/WorkAreaLib.py
