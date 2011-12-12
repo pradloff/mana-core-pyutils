@@ -1,3 +1,10 @@
+2011-12-12  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-11-12
+	* support for manacore
+	* M python/WorkAreaLib.py
+	* M bin/setupWorkArea.py
+
 2011-12-08  Sebastien Binet  <binet@voatlas51.cern.ch>
 
 	* tagging PyUtils-00-11-11

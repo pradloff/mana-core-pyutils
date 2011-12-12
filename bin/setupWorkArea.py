@@ -132,6 +132,7 @@ def _processOptions( useropts, userlongopts ):
                                 "tier0",
                                 "hlt",
                                 "offline",
+                                "manacore",
                                 ]
     # defaults
     workAreas  = []
