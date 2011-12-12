@@ -239,12 +239,14 @@ def createUseList(workAreas, suppressList = ["WorkArea"]):
 
 def _translate_runtimepkg_name(n):
     db = {
-        'hlt': 'HLT',
+        'hlt': 'AtlasHLT',
+        'manacore': 'ManaCore',
+        'detcommon': 'DetCommon',
         }
     if n in db:
         return db[n]
     else:
-        return n[0].upper() + n[1:]
+        return 'Atlas'+n[0].upper() + n[1:]
     
 def createWorkArea(workAreas = None, installDir = None,
                    runTimePkg = 'offline', suppressList = None):
@@ -296,7 +298,7 @@ def createWorkArea(workAreas = None, installDir = None,
         "",
         "## Generic part...",
         "use AtlasPolicy 	 \tAtlasPolicy-*",
-        "use Atlas%sRunTime \tAtlas%sRunTime-*" % (atlasRunTime, atlasRunTime),
+        "use %sRunTime \t%sRunTime-*" % (atlasRunTime, atlasRunTime),
         "",
         "branches run python",
         "",
