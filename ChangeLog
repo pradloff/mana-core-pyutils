@@ -1,3 +1,9 @@
+2011-12-14  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-11-14
+	* improve CLI of atl-gen-athena-d3pd-reader
+	* M bin/atl-gen-athena-d3pd-reader
+
 2011-12-12  Sebastien Binet  <sebastien.binet@cern.ch>
 
 	* tagging PyUtils-00-11-13

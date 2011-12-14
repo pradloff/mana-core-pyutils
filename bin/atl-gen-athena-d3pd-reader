@@ -6,6 +6,8 @@ import os
 import sys
 import textwrap
 
+import argparse
+
 # 3rd-party imports
 # delay ROOT import as it is quite slow...
 ROOT = None
@@ -548,10 +550,29 @@ def process(fnames, output):
     return 0
 
 def main():
-    fname = sys.argv[1]
-    print ":: generating d3pd-reader from [%s]..." % fname
-    process([fname], "code")
-    return 0
+    parser = argparse.ArgumentParser(
+        description='generate d3pd objects for use in Athena, '+ \
+                    'from metadata contained in d3pd n-tuples'
+        )
+    parser.add_argument('fnames',
+                        type=str,
+                        nargs='+',
+                        help='input d3pd files')
+    parser.add_argument('--output-dir', '-o',
+                        type=str,
+                        default='code',
+                        help='output directory containing the generated code'
+                        )
+    args = parser.parse_args()
+    print ":"*80
+    print ":: generating d3pd-reader from:"
+    for f in args.fnames:
+        print ":: - %s" % f
+        pass
+    sc = process(args.fnames, args.output_dir)
+    print ":: done [sc=%s]" % sc
+    print ":"*80
+    return sc
 
 
 if __name__ == "__main__":
