@@ -13,6 +13,7 @@ __all__ = [
     ]
 
 import os
+import re
 
 def _libName(lib):
     import platform
@@ -68,6 +69,15 @@ _cpp_builtins = (
     'long double',
     'bool',
     )
+
+_is_stl_sequence = re.compile (r'std::(?P<ContType>.*?)'\
+                               r'<(?P<TemplateArg>.*?)'\
+                               r',\s*?std::allocator<\2> >')
+_is_stl_mapping = re.compile (r'std::map<'\
+                              r'(?P<TemplateArg1>.*?),\s*?'\
+                              r'(?P<TemplateArg2>.*?)'\
+                              r',\s*?std::allocator<\2> >')
+    
 
 ### functions -----------------------------------------------------------------
 
@@ -152,7 +162,9 @@ def gen_typeregistry_dso(oname=_dflt_typereg_fname):
     
     msg.info("installing registry in [%s]...", oname)
 
-    reg = DsoDb()
+    # FIXME: should use the Cxx one...
+    #reg = DsoDb()
+    reg = PyDsoDb()
     
     cls_names = reg.db.keys()
     msg.debug("::: loading reflex")
@@ -208,7 +220,7 @@ def gen_typeregistry_dso(oname=_dflt_typereg_fname):
         for i in xrange(rflx.TypeSize()):
             rflx_type = rflx.TypeAt(i)
             rflx_name = rflx_type.Name(7)
-            root_name = reg._to_rootmap_name(rflx_name)
+            root_name = _to_rootmap_name(rflx_name)
 ##             # could also retro-fit typedefs, and allow their auto-loading...
 ##             if rflx_type.IsTypedef():
 ##                 import ROOT
@@ -298,21 +310,143 @@ def _is_rootcint_dict (libname):
     return not (libname.startswith("lib")) and \
            not (pat.match (libname) is None)
 
-class DsoDb( object ):
+class CxxDsoDb(object):
+    """
+    The repository of 'rootmap' files (location, content,...)
+    """
+    def __init__(self):
+        import PyUtils.RootUtils as ru
+        ROOT = ru.import_root()
+        self._cxx = ROOT.Ath.DsoDb.instance()
+        return
+
+    def _to_py(self, cxx):
+        dd = {}
+        kk = self._cxx.py_keys_from(cxx)
+        vv = self._cxx.py_vals_from(cxx)
+        for i in range(kk.size()):
+            dd[kk[i]] = list(vv[i])
+        return dd
+
+    @property
+    def db(self):
+        return self._to_py(self._cxx.db())
+    
+    @property
+    def pf(self):
+        return self._to_py(self._cxx.pf())
+    
+    def has_type(self, typename):
+        return self._cxx.has_type(typename)
+
+    def load_type(self, typename):
+        return self._cxx.load_type(typename)
+    
+    def capabilities(self, libname):
+        return list(self._cxx.capabilities(libname))
+    
+    def duplicates(self, libname, pedantic=False):
+        return self._to_py(self._cxx.duplicates(libname, pedantic))
+
+    def dict_duplicates(self, pedantic=False):
+        return self._to_py(self._cxx.dict_duplicates(pedantic))
+
+    dictDuplicates = dict_duplicates
+    
+    def pf_duplicates(self, pedantic=False):
+        return self._to_py(self._cxx.pf_duplicates(pedantic))
+
+    pfDuplicates = pf_duplicates
+    
+    def libs(self, detailed=False):
+        return list(self._cxx.libs(detailed))
+
+    def content(self, pedantic):
+        return self._to_py(self._cxx.content(pedantic))
+
+    @property
+    def dso_files(self):
+        return list(self._cxx.dso_files())
+
+    @property
+    def dsoFiles(self):
+        return self.dso_files
+
+def _to_rootmap_name(typename):
+    """
+    helper method to massage a typename into something understandable
+    by the rootmap files
+    """
+    global _aliases
+    typename = typename.replace(', ',',')
+    # first the easy case: builtins
+    if typename in _cpp_builtins:
+        return typename
+    # known missing aliases ?
+    if typename in _aliases.keys():
+        t = _aliases[typename]
+        return _to_rootmap_name(t)
+    # handle default template arguments of STL sequences
+    if _is_stl_sequence.match(typename):
+        # rootmap files do not contain the default template arguments
+        # for STL containers... consistency, again.
+        _m = _is_stl_sequence.match(typename)
+        _cont_type = _m.group('ContType')
+        _m_type = _m.group('TemplateArg')
+        # handle the dreaded 'std::Bla<Foo<d> >
+        _m_type = _to_rootmap_name(_m_type.strip())
+        if _m_type.endswith('>'):
+            _m_type += ' '
+        typename = 'std::%s<%s>' % (_m.group('ContType'),
+                                    _m_type)
+    # need to massage a bit the typename to match ROOT naming convention
+    typename = typename.replace('std::basic_string<char> ',
+                                'string ')
+    typename = typename.replace('std::basic_string<char>',
+                                'string')
+    typename = typename.replace('std::', '')
+    typename = typename.replace('> >', '>->')
+    typename = typename.replace(' >', '>')
+    typename = typename.replace('>->', '> >')
+    return typename
+
+def _to_rflx_name (typename):
+    """helper method to massage a typename into something understandable
+    by reflex (which doesn't understand the same thing than rootmaps).
+    """
+    global _aliases,_typedefs
+    typename = typename.replace(', ',',')
+    # first the easy case: builtins
+    if typename in _cpp_builtins:
+        return typename
+    # known missing typedefs ?
+    if typename in _typedefs.keys():
+        t = _typedefs[typename]
+        return _to_rflx_name(t)
+    # handle default template arguments of STL sequences
+    if _is_stl_sequence.match(typename):
+        # rootmap files do not contain the default template arguments
+        # for STL containers... consistency, again.
+        _m = _is_stl_sequence.match (typename)
+        _m_type = _m.group('TemplateArg')
+        # handle the dreaded 'std::Bla<Foo<d> >
+        _m_type = _to_rflx_name (_m_type.strip())
+        if _m_type.endswith('>'):
+            _m_type += ' '
+        typename = 'std::%s<%s>' % (_m.group('ContType'), _m_type)
+    typename = typename.replace('std::string>',
+                                'std::basic_string<char> >')
+    typename = typename.replace('std::string',
+                                'std::basic_string<char>')
+    return typename
+
+class PyDsoDb( object ):
     """
     The repository of 'rootmap' files (location, content,...)
     """
     RootMap = "rootmap"
     DsoMap  = "dsomap"
     PluginNamespace = "__pf__"
-    
-    _is_stl_sequence = re.compile (r'std::(?P<ContType>.*?)'\
-                                   r'<(?P<TemplateArg>.*?)'\
-                                   r',\s*?std::allocator<\2> >')
-    _is_stl_mapping = re.compile (r'std::map<'\
-                                  r'(?P<TemplateArg1>.*?),\s*?'\
-                                  r'(?P<TemplateArg2>.*?)'\
-                                  r',\s*?std::allocator<\2> >')
     
     def __init__(self, name = "DsoDb"):
         object.__init__(self)
@@ -347,7 +481,7 @@ class DsoDb( object ):
                 msg.warning("could not run os.listdir on [%s]" % path)
                 dir_content = []
             dsoFiles = [ f for f in dir_content
-                         if f.endswith(DsoDb.RootMap) ]
+                         if f.endswith(self.RootMap) ]
             for dsoFile in dsoFiles:
                 dsoFile = os.path.join( path, dsoFile )
                 if os.path.exists(dsoFile):
@@ -378,7 +512,7 @@ class DsoDb( object ):
                                 .replace( ":", ""  )\
                                 .replace( "@", ":" )\
                                 .replace( "-", " " )
-                        if dsoKey.startswith( DsoDb.PluginNamespace ):
+                        if dsoKey.startswith( self.PluginNamespace ):
                             db = self.pf
                         else:
                             db = self.db
@@ -493,66 +627,13 @@ class DsoDb( object ):
         helper method to massage a typename into something understandable
         by the rootmap files
         """
-        global _aliases
-        typename = typename.replace(', ',',')
-        # first the easy case: builtins
-        if typename in _cpp_builtins:
-            return typename
-        # known missing aliases ?
-        if typename in _aliases.keys():
-            t = _aliases[typename]
-            return self._to_rootmap_name(t)
-        # handle default template arguments of STL sequences
-        if self._is_stl_sequence.match(typename):
-            # rootmap files do not contain the default template arguments
-            # for STL containers... consistency, again.
-            _m = self._is_stl_sequence.match(typename)
-            _cont_type = _m.group('ContType')
-            _m_type = _m.group('TemplateArg')
-            # handle the dreaded 'std::Bla<Foo<d> >
-            _m_type = self._to_rootmap_name(_m_type.strip())
-            if _m_type.endswith('>'):
-                _m_type += ' '
-            typename = 'std::%s<%s>' % (_m.group('ContType'),
-                                        _m_type)
-        # need to massage a bit the typename to match ROOT naming convention
-        typename = typename.replace('std::basic_string<char> ',
-                                    'string ')
-        typename = typename.replace('std::basic_string<char>',
-                                    'string')
-        typename = typename.replace('std::', '')
-        typename = typename.replace('> >', '>->')
-        typename = typename.replace(' >', '>')
-        typename = typename.replace('>->', '> >')
-        return typename
+        return _to_rootmap_name(typename)
 
     def _to_rflx_name (self, typename):
         """helper method to massage a typename into something understandable
         by reflex (which doesn't understand the same thing than rootmaps).
         """
-        global _aliases,_typedefs
-        typename = typename.replace(', ',',')
-        # first the easy case: builtins
-        if typename in _cpp_builtins:
-            return typename
-        # known missing typedefs ?
-        if typename in _typedefs.keys():
-            t = _typedefs[typename]
-            return self._to_rflx_name(t)
-        # handle default template arguments of STL sequences
-        if self._is_stl_sequence.match(typename):
-            # rootmap files do not contain the default template arguments
-            # for STL containers... consistency, again.
-            _m = self._is_stl_sequence.match (typename)
-            _m_type = _m.group('TemplateArg')
-            # handle the dreaded 'std::Bla<Foo<d> >
-            _m_type = self._to_rflx_name (_m_type.strip())
-            if _m_type.endswith('>'):
-                _m_type += ' '
-            typename = 'std::%s<%s>' % (_m.group('ContType'), _m_type)
-        typename = typename.replace('std::string>',
-                                    'std::basic_string<char> >')
-        typename = typename.replace('std::string',
-                                    'std::basic_string<char>')
-        return typename
+        return _to_rflx_name(typename)
 
+DsoDb = CxxDsoDb
+#DsoDb = PyDsoDb

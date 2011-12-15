@@ -157,7 +157,7 @@ if __name__ == "__main__":
         
     if options.dumpLibs:
         print "::: dumping all known libraries..."
-        libs = dsoDb.libs(detailedDump = options.detailedDump)
+        libs = dsoDb.libs(options.detailedDump)
         for lib in libs:
             print " -",lib
         print "::: known libs:",len(libs)
