@@ -1,3 +1,10 @@
+2011-12-15  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-11-15
+	* fix bug 89667: c++ impl. for DsoDb
+	* M python/Dso.py
+	* M bin/checkPlugins.py
+
 2011-12-14  Sebastien Binet  <sebastien.binet@cern.ch>
 
 	* tagging PyUtils-00-11-14
