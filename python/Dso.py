@@ -315,9 +315,18 @@ class CxxDsoDb(object):
     The repository of 'rootmap' files (location, content,...)
     """
     def __init__(self):
+        # import cintex
+        import PyCintex; PyCintex.Cintex.Enable()
+        # import root
         import PyUtils.RootUtils as ru
         ROOT = ru.import_root()
         self._cxx = ROOT.Ath.DsoDb.instance()
+        # load reflex
+        _load_dict = PyCintex.loadDict
+        _load_dict('ReflexRflx')
+        self._rflx = PyCintex.makeNamespace('Reflex')
+        if not self._rflx:
+            self._rflx = PyCintex.makeNamespace('ROOT::Reflex')
         return
 
     def _to_py(self, cxx):
