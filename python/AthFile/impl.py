@@ -1010,7 +1010,10 @@ class FilePeeker(object):
                 re.compile('TClass::TClass:0: RuntimeWarning: no dictionary for class.*'),
                 re.compile("Error in <T.*?File::Init>:.*? not a ROOT file")]):
                 # for AttributeListLayout which uses CINT for its dict...
-                root.gSystem.Load('liblcg_RootCollection')
+                # first try the APR version
+                if 0 != root.gSystem.Load('libRootCollection'):
+                    # then try the POOL one
+                    root.gSystem.Load('liblcg_RootCollection')
                 if raw:
                     f = root.TFile.Open(fname+'?filetype=raw', 'READ')
                 else:
