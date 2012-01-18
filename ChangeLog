@@ -1,3 +1,10 @@
+2012-01-18  Sebastien Binet  <binet@voatlas51.cern.ch>
+
+	* tagging PyUtils-00-11-17
+	* fix bug 89984: load dict for AttributeListLayout from APR then
+	  fallback on the POOL location.
+	* M python/AthFile/impl.py
+
 2011-12-16  Sebastien Binet  <sebastien.binet@cern.ch>
 
 	* tagging PyUtils-00-11-16
