@@ -249,7 +249,7 @@ def _translate_runtimepkg_name(n):
         return 'Atlas'+n[0].upper() + n[1:]
     
 def createWorkArea(workAreas = None, installDir = None,
-                   runTimePkg = 'offline', suppressList = None):
+                   runTimePkg = None, suppressList = None):
 
     msg = logging.getLogger("WorkAreaMgr")
     if workAreas is None:
@@ -260,6 +260,9 @@ def createWorkArea(workAreas = None, installDir = None,
        suppressList.append( "WorkArea" )
        pass
 
+    if runTimePkg is None:
+        runTimePkg = os.getenv('AtlasProject', 'AtlasOffline')
+        
     atlasRunTime = _translate_runtimepkg_name(runTimePkg)
     
     defaultWorkArea = os.environ[CmtStrings.CMTPATH].split(os.pathsep)[0]
