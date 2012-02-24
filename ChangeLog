@@ -1,3 +1,10 @@
+2012-02-24  Sebastien Binet  <binet@voatlas51.cern.ch>
+
+	* tagging PyUtils-00-11-18
+	* infer the runtime from the AtlasProject env. variable
+	* M python/WorkAreaLib.py
+	* M bin/setupWorkArea.py
+
 2012-01-18  Sebastien Binet  <binet@voatlas51.cern.ch>
 
 	* tagging PyUtils-00-11-17
