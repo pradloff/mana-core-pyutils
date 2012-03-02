@@ -1,3 +1,9 @@
+2012-03-02  Sebastien Binet  <binet@voatlas51.cern.ch>
+
+	* tagging PyUtils-00-11-19
+	* removed old and non used anymore json import
+	* M python/RootUtils.py
+
 2012-02-24  Sebastien Binet  <binet@voatlas51.cern.ch>
 
 	* tagging PyUtils-00-11-18
