@@ -256,7 +256,7 @@ def gen_source(clsname, outdir, obj):
         '%(classname)s' % vardict,
         '%(classname)s::create(const std::string& prefix, const StoreGateSvc_t& svc)' % vardict,
         '{',
-        '  %(classname)s o(prefix, svc);' % vardict,
+        '   %(classname)s o(prefix, svc);' % vardict,
         ]
     
     retr_const = [
@@ -317,10 +317,12 @@ def gen_source(clsname, outdir, obj):
             '''\
             %(indent)s {
             %(indent)s   std::string key = m_prefix + "%(cls_var_name_str)s";
-            %(indent)s   if (m_store->contains<%(cls_var_type)s >(key)) {
+            %(indent)s   if (m_store->contains< %(cls_var_type)s >(key)) {
             %(indent)s      if (!m_store->retrieve((const %(cls_var_type)s*&)%(cls_var_name)s, key).isSuccess()) {
             %(indent)s         return StatusCode::FAILURE;
             %(indent)s      }
+            %(indent)s   } else {
+            %(indent)s      ((%(cls_var_type)s*&)%(cls_var_name)s) = NULL;
             %(indent)s   }
             %(indent)s }
             ''' )
@@ -336,10 +338,12 @@ def gen_source(clsname, outdir, obj):
             '''\
             %(indent)s {
             %(indent)s   std::string key = m_prefix + "%(cls_var_name_str)s";
-            %(indent)s   if (m_store->contains<%(cls_var_type)s >(key)) {
+            %(indent)s   if (m_store->contains< %(cls_var_type)s >(key)) {
             %(indent)s      if (!m_store->retrieve((%(cls_var_type)s*&)%(cls_var_name)s, key).isSuccess()) {
             %(indent)s         return StatusCode::FAILURE;
             %(indent)s      }
+            %(indent)s   } else {
+            %(indent)s      %(cls_var_name)s = NULL;
             %(indent)s   }
             %(indent)s }
             ''' )
@@ -374,13 +378,19 @@ def gen_source(clsname, outdir, obj):
             %(cls_fct_type)s
             %(classname)s::%(cls_fct_name)s(%(cls_fct_args)s) const
             {
-              return %(do_deref)sthis->%(cls_var_name)s%(cls_fct_args_body)s;
+              static %(cls_fct_ref_type)s s_default %(cls_var_default)s;
+              return this->%(cls_var_name)s
+                ? %(do_deref)sthis->%(cls_var_name)s%(cls_fct_args_body)s
+                : s_default;
             }
 
             %(cls_fct_ref_type)s&
             %(classname)s::%(cls_fct_name)s(%(cls_fct_args)s)
             {
-              return %(do_deref)sthis->%(cls_var_name)s%(cls_fct_args_body)s;
+              static %(cls_fct_ref_type)s s_default %(cls_var_default)s;
+              return this->%(cls_var_name)s
+                ? %(do_deref)sthis->%(cls_var_name)s%(cls_fct_args_body)s
+                : s_default;
             }
             ''' % {
             'indent': " "*2,
@@ -392,6 +402,7 @@ def gen_source(clsname, outdir, obj):
             'cls_fct_args': '' if not is_cont else 'std::size_t idx',
             'cls_fct_args_body': '' if not is_cont else '->at(idx)',
             'cls_var_name': gen_varname(v.name()),
+            'cls_var_default': '' if is_cont else '= 0',    
             })
         cls_fcts_impl.append(snippet)
 

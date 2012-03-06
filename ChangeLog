@@ -1,3 +1,9 @@
+2012-03-06  Sebastien Binet  <binet@voatlas51.cern.ch>
+
+	* tagging PyUtils-00-11-20
+	* more protections + improved d3pd-reader-object generator
+	* M bin/atl-gen-athena-d3pd-reader
+
 2012-03-02  Sebastien Binet  <binet@voatlas51.cern.ch>
 
 	* tagging PyUtils-00-11-19
