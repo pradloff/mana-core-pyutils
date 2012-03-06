@@ -248,7 +248,8 @@ def _processOptions( useropts, userlongopts ):
              log.info('taking runtime package [%s] from .asetup.save',
                       runTimePkg)
        else:
-          runTimePkg = 'offline'
+          # take it from env-var AtlasProject
+          runTimePkg = None # 'offline'
 
     return workAreas, installDir, runTimePkg, suppressList
     

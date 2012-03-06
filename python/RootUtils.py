@@ -20,11 +20,6 @@ import sys
 import re
 from pprint import pprint
 
-try:
-    import simplejson as json
-except ImportError:
-    import json
-
 from .Decorators import memoize
 
 ### functions -----------------------------------------------------------------
