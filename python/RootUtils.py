@@ -161,6 +161,9 @@ class RootFileDumper(object):
 
         ROOT = import_root()
 
+        # remember if an error or problem occurred during the dump
+        self.allgood = True
+        
         self.root_file = ROOT.TFile.Open(fname)
         if (self.root_file is None or
             not isinstance(self.root_file, ROOT.TFile) or
@@ -231,6 +234,7 @@ class RootFileDumper(object):
             err = tree.LoadTree(ientry)
             if err < 0:
                 print "**err** loading tree for entry",ientry
+                self.allgood = False
                 break
 
             nbytes = tree.GetEntry(ientry)
@@ -238,6 +242,7 @@ class RootFileDumper(object):
                 print "**err** reading entry [%s] of tree [%s]" % (ientry, tree_name)
                 hdr = ":: entry [%05i]... [ERR]" % (ientry,)
                 print hdr
+                self.allgood = False
                 continue
 
             for br_name in leaves:
@@ -249,7 +254,14 @@ class RootFileDumper(object):
                 val = getattr(tree, br_name)
                 if not (val is None):
                     #print "-->",val,br_name
-                    vals = _pythonize(val, py_name)
+                    try:
+                        vals = _pythonize(val, py_name)
+                    except Exception, err:
+                        print "**err** for branch [%s] val=%s (type=%s)" % (
+                            br_name, val, type(val),
+                            )
+                        self.allgood = False
+                        print err
                     for o in vals:
                         n = map(str, o[0])
                         v = o[1]
