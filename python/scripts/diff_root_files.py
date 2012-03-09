@@ -134,6 +134,9 @@ def main(args):
                 print '::sync-old %s' % '.'.join(["%03i"%ientry]+map(str, d[0][2]))
                 print '::sync-new %s' % '.'.join(["%03i"%ientry]+map(str, d[1][2]))
                 summary[name[0]] += 1
+                # remember for later
+                fold.allgood = False
+                fnew.allgood = False
                 continue
             
             n = '.'.join(map(str, ["%03i"%ientry]+name))
@@ -159,7 +162,13 @@ def main(args):
         for n in keys:
             v = summary[n]
             msg.info(' [%s]: %i leaves differ', n, v)
-            
+            pass
+        
+        if (not fold.allgood) or (not fnew.allgood):
+            msg.info('NOTE: there were errors during the dump')
+            msg.info('fold.allgood: %s' % fold.allgood)
+            msg.info('fnew.allgood: %s' % fnew.allgood)
+            n_bad += 0.5
         return n_bad
     
     ndiff = diff_tree(fold, fnew, args)
