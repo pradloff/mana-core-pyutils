@@ -1,3 +1,9 @@
+2012-03-16  Sebastien Binet  <binet@voatlas51.cern.ch>
+
+	* tagging PyUtils-00-11-22
+	* fix for 64b where dl module does not exist anymore
+	* M bin/vmem-sz.py
+
 2012-03-09  Sebastien Binet  <binet@voatlas51.cern.ch>
 
 	* tagging PyUtils-00-11-21

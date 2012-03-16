@@ -6,7 +6,7 @@ __author__ = "Sebastien Binet <binet@cern.ch>"
 __doc__    = "get the inclusive and exclusive vmem sizes of a library"
 __version__= "$Revision: 1.2 $"
 
-import user, ctypes, sys, os, dl
+import user, ctypes, sys, os
 from PyUtils.Decorators import forking as forking
 from PerfMonComps.PyMonUtils import loaded_libs, pymon
 
@@ -14,11 +14,12 @@ _veto_libs = [
     'resource.so', # from python std-lib 'resource'...
     ]
 
-if 0:
+if 1:
     def lib_loader(libname):
         return ctypes.cdll.LoadLibrary(libname)
 else:
     def lib_loader(libname):
+        import dl
         return dl.open(libname, dl.RTLD_LAZY|dl.RTLD_GLOBAL)
     
 @forking
