@@ -6,7 +6,14 @@ __author__ = "Sebastien Binet <binet@cern.ch>"
 __doc__    = "get the inclusive and exclusive vmem sizes of a library"
 __version__= "$Revision: 1.2 $"
 
-import user, ctypes, sys, os
+## std imports
+import argparse
+import ctypes
+import os
+import sys
+import user
+
+## 3rd-party imports
 from PyUtils.Decorators import forking as forking
 from PerfMonComps.PyMonUtils import loaded_libs, pymon
 
@@ -14,13 +21,8 @@ _veto_libs = [
     'resource.so', # from python std-lib 'resource'...
     ]
 
-if 1:
-    def lib_loader(libname):
-        return ctypes.cdll.LoadLibrary(libname)
-else:
-    def lib_loader(libname):
-        import dl
-        return dl.open(libname, dl.RTLD_LAZY|dl.RTLD_GLOBAL)
+def lib_loader(libname):
+    return ctypes.cdll.LoadLibrary(libname)
     
 @forking
 def load_lib (libname):
@@ -139,12 +141,23 @@ def main():
     import sys
     import os
 
-    libnames = [l for l in sys.argv[1:] if not l.startswith('-')]
-    doDetailed = True if '--detailed' in sys.argv[1:] else False
+    parser = argparse.ArgumentParser(
+        description='get the inclusive and exclusive vmem sizes of a library'
+        )
+    _add = parser.add_argument
+    _add('libnames',
+         type=str,
+         nargs='+',
+         help='list of library names to be inspected')
+    _add('--detailed',
+         action='store_true',
+         default=False,
+         help='enable detailed output')
+    args = parser.parse_args()
 
-    if len(libnames) == 0:
-        print "**error**: you need to give at least one library name to analyse"
-        sys.exit(1)
+    libnames = args.libnames
+    doDetailed = args.detailed
+    
     print ":: inspecting libraries: %s" % libnames
     display,lib_stats = analyze_libraries (libnames, doDetailed)
 

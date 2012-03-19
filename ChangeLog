@@ -1,3 +1,9 @@
+2012-03-19  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* tagging PyUtils-00-11-24
+	* fix bug #92664: use argparse for vmem-sz
+	* M bin/vmem-sz.py
+
 2012-03-19  Sebastien Binet  <binet@voatlas51.cern.ch>
 
 	* tagging PyUtils-00-11-23
