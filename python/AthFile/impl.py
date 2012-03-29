@@ -9,42 +9,15 @@ __version__ = "$Revision$"
 __author__  = "Sebastien Binet"
 __doc__ = "implementation of AthFile-server behind a set of proxies to isolate environments"
 
-import os
-import sys
 import errno
-import multiprocessing
-import multiprocessing.managers
-
-mp = multiprocessing
+import os
+import subprocess
+import sys
 
 import PyUtils.Helpers as H
 from PyUtils.Helpers    import ShutUp
 from .timerdecorator import timelimit, TimeoutError
 
-# -----------------------------------------------------------------------------
-# properly setup tempfile.gettempdir() to prevent from creating
-# sockets under AFS directories (AFS doesn't support those...)
-def _afs_fixup_tempdir():
-    import tempfile
-    tmp = tempfile.gettempdir()
-    import os, re, commands
-    rc,wich_fs = commands.getstatusoutput('which fs')
-    if rc:
-        # bet there is no AFS mount in here...
-        return
-    
-    with H.ShutUp(filters=[re.compile(r'.*')]):
-        rc = os.system('fs whichcell %s' % tmp)
-    if rc == 0:
-        # tmp is under an AFS served directory.
-        # gambling that '/tmp' isn't
-        tempfile.tempdir = '/tmp'
-        tmp = tempfile.gettempdir()
-    return
-_afs_fixup_tempdir()
-del _afs_fixup_tempdir
-# -----------------------------------------------------------------------------
-        
 ### globals -------------------------------------------------------------------
 DEFAULT_AF_CACHE_FNAME = os.environ.get('DEFAULT_AF_CACHE_FNAME',
                                         'athfile-cache.ascii.gz')
@@ -300,78 +273,6 @@ class AthFile (object):
     
     pass # AthFile class
 
-class AthFileSubprocess(mp.Process):
-    
-    def join(self, timeout=DEFAULT_AF_TIMEOUT):
-        '''
-        Wait until child process terminates
-        '''
-        import sys
-        return mp.Process.join(self, timeout)
-        
-
-class AthFileMgr(mp.managers.BaseManager):
-    """the manager of AthFile functionalities
-    """
-    ## FIXME: this has been copy-pasted from BaseManager.start
-    ##        use initializer+initargs when available:
-    ##        http://bugs.python.org/issue5585
-    def start(self):
-        '''
-        Spawn a server process for this manager object
-        '''
-        State = mp.managers.State
-        connection = mp.connection
-        Process = AthFileSubprocess
-        util = mp.util
-        assert self._state.value == State.INITIAL
-
-        def _bootstrap(self):
-            import os
-            # make this (child) process terminate if parent does
-            try:
-                import ctypes, signal
-                from ctypes.util import find_library as ctypes_find_library
-                libc = ctypes.cdll.LoadLibrary( ctypes_find_library('c') )
-                PR_SET_PDEATHSIG = 1
-                signal_nbr = signal.SIGTERM
-                prctl = libc.prctl
-                prctl.argtypes = (ctypes.c_int, ctypes.c_ulong, ctypes.c_ulong,
-                                  ctypes.c_ulong, ctypes.c_ulong)
-                prctl(PR_SET_PDEATHSIG, signal_nbr, 0, 0, 0 )
-            except Exception,err:
-                pass            # don't worry about it failing ...
-            return Process._bootstrap(self)
-        
-        # pipe over which we will retrieve address of server
-        reader, writer = connection.Pipe(duplex=False)
-
-        # spawn process which runs a server
-        self._process = Process(
-            target=type(self)._run_server,
-            args=(self._registry, self._address, self._authkey,
-                  self._serializer, writer),
-            )
-        ident = ':'.join(str(i) for i in self._process._identity)
-        self._process.name = type(self).__name__  + '-' + ident
-        self._process._bootstrap = _bootstrap.__get__(self._process)
-        self._process.start()
-
-        # get address of server
-        writer.close()
-        self._address = reader.recv()
-        reader.close()
-
-        # register a finalizer
-        self._state.value = State.STARTED
-        self.shutdown = util.Finalize(
-            self, type(self)._finalize_manager,
-            args=(self._process, self._address, self._authkey,
-                  self._state, self._Client),
-            exitpriority=0
-            )
-    pass
-
 def _get_msg(name="AthFile"):
     import PyUtils.Logging as _L
     msg = _L.logging.getLogger(name)
@@ -392,12 +293,6 @@ class AthFileServer(object):
         #self._msg = mp.get_logger("AthFile")
         #self._msg.setFormat("Py:%(name)-14s%(levelname)8s %(message)s")
 
-        # prevent ROOT from looking into $HOME for .rootrc files
-        # we carefully (?) set this environment variable *only* in the forked
-        # subprocess to not stomp on the toes of our parent one which is
-        # user-driven (and might need user-customized macros or configurations)
-        os.environ['ROOTENV_NO_HOME'] = '1'
-        
         #self.msg.info('importing ROOT...')
         import PyUtils.RootUtils as ru
         self.pyroot = ru.import_root()
@@ -413,28 +308,12 @@ class AthFileServer(object):
         self._do_pers_cache = True
         self.enable_pers_cache()
 
-        # prevent from running athena-mp in child processes
-        if 'ATHENA_PROC_NUMBER' in os.environ:
-            del os.environ['ATHENA_PROC_NUMBER']
-            
-        # prevent from running athena in interactive mode (and freeze)
-        if 'PYTHONINSPECT' in os.environ:
-            del os.environ['PYTHONINSPECT']
-            
-        # instantiate a "request handler"
-        self._peeker = FilePeeker(self)
-
         return
 
-    def _setenv(self, k, v):
-        """allows the parent process to modify this process' environment
-        variables
-        """
-        self._msg.debug("-> os.environ[%s] = %s", k, v)
-        if not k in ('PYTHONINSPECT','ATHENA_PROC_NUMBER'):
-            os.environ[k] = v
-        else:
-            self._msg.debug("-> os.environ[%s] = %s (DISCARDED!!)", k, v)
+    # make the _peeker on-demand to get an up-to-date os.environ
+    @property
+    def _peeker(self):
+        return FilePeeker(self)
     
     def _cleanup_pyroot(self):
         import PyUtils.RootUtils as ru
@@ -442,8 +321,9 @@ class AthFileServer(object):
         tfiles = root.gROOT.GetListOfFiles()[:]
         for i,f in enumerate(tfiles):
             try:
-                f.Close()
-                del f
+                if f:
+                    f.Close()
+                    del f
             except Exception,err:
                 self._msg.info('could not close a TFile:\n%s', err)
                 pass
@@ -499,6 +379,9 @@ class AthFileServer(object):
             with H.ShutUp(filters=[
                 re.compile(
                     'TClass::TClass:0: RuntimeWarning: no dictionary for.*'),
+                re.compile(
+                    'Warning in <TEnvRec::ChangeValue>: duplicate entry.*'
+                    ),
                 ]):
                 f = self.pyroot.TFile.Open(fname+"?filetype=raw", "read")
                 if f is None or not f:
@@ -1000,7 +883,20 @@ class FilePeeker(object):
         self.server= server
         self.msg   = server.msg
         self.pyroot= server.pyroot
-        
+        self._sub_env = dict(os.environ)
+        # prevent ROOT from looking into $HOME for .rootrc files
+        # we carefully (?) set this environment variable *only* in the
+        # subprocess to not stomp on the toes of our parent one which is
+        # user-driven (and might need user-customized macros or configurations)
+        self._sub_env['ROOTENV_NO_HOME'] = '1'
+
+        # prevent from running athena-mp unadvertantly...
+        self._sub_env['ATHENA_PROC_NUMBER'] ='0'
+
+        # prevent from running athena in interactive mode (and freeze)
+        if 'PYTHONINSPECT' in self._sub_env:
+            del self._sub_env['PYTHONINSPECT']
+
     def _root_open(self, fname, raw=False):
         import PyUtils.Helpers as H
         with H.restricted_ldenviron(projects=['AtlasCore']):
@@ -1109,11 +1005,6 @@ class FilePeeker(object):
             file_type, file_name = self.server.ftype(f_raw)
             import os
 
-            # make sure we don't run the peeking-athena job in MP mode...
-            if 'ATHENA_PROC_NUMBER' in os.environ:
-                del os.environ['ATHENA_PROC_NUMBER']
-                pass
-            
             protocol,file_name = self.server.fname(fname)
             f['file_md5sum'] = self.server.md5sum(f_raw)
             f['file_name'] = file_name
@@ -1124,9 +1015,9 @@ class FilePeeker(object):
                 # FIXME: best would be to do that in athfile_peeker.py but
                 #        athena.py closes sys.stdin when in batch, which confuses
                 #        PyCmt.Cmt:subprocess.getstatusoutput
-                import commands
-                cmd = 'pool_insertFileToCatalog.py %s' % (file_name,)
-                commands.getstatusoutput(cmd)
+                cmd = ['pool_insertFileToCatalog.py',
+                       file_name,]
+                subprocess.call(cmd, env=self._sub_env)
                 #
                 with H.restricted_ldenviron(projects=projects):
                     is_tag, tag_ref, tag_guid, nentries, runs, evts = self._is_tag_file(f_root, evtmax)
@@ -1146,12 +1037,20 @@ class FilePeeker(object):
                         if os.path.exists(out_pkl_fname):
                             os.remove(out_pkl_fname)
                         import AthenaCommon.ChapPy as api
-                        os.putenv('ATHENA_PROC_NUMBER','0')
                         app = api.AthenaApp(cmdlineargs=["--nprocs=0"])
                         app << """
                             FNAME = %s
                             """ % str([file_name])
                         app << """
+                            import os
+                            # prevent from running athena-mp in child processes
+                            os.putenv('ATHENA_PROC_NUMBER','0')
+    
+                            # prevent from running athena in interactive mode (and freeze)
+                            if 'PYTHONINSPECT' in os.environ:
+                                del os.environ['PYTHONINSPECT']
+            
+
                             include('AthenaPython/athfile_peeker.py')
                             from AthenaCommon.AlgSequence import AlgSequence
                             job = AlgSequence()
@@ -1171,7 +1070,7 @@ class FilePeeker(object):
                             }
                         import os
                         stdout = open('athfile-%i.log.txt' % os.getpid(), "a")
-                        sc = app.run(stdout=stdout)
+                        sc = app.run(stdout=stdout, env=self._sub_env)
                         stdout.close()
                         import AthenaCommon.ExitCodes as ath_codes
                         if sc == 0:
@@ -1357,28 +1256,4 @@ class FilePeeker(object):
         return file_infos
 
     pass # class FilePeeker
-
-# register a proxy for logging.Logger instances
-LoggerProxy = mp.managers.MakeProxyType(
-    'LoggerProxy',
-    ('debug', 'info', 'warning', 'error', 'setLevel')
-    )
-AthFileMgr.register('Logger', proxytype=LoggerProxy, create_method=False)
-
-# register the AthFileServer with the manager
-AthFileServerProxy = mp.managers.MakeProxyType(
-    'AthFileServerProxy',
-    ('msg',
-     '_cleanup_pyroot', '_setenv',
-     'cache', 'save_cache', 'load_cache', 'flush_cache',
-     'enable_pers_cache', 'disable_pers_cache',
-     'ftype', 'exists', 'fopen', 'fname',
-     'md5sum',
-     )
-    )
-AthFileServerProxy._method_to_typeid_ = {
-    'msg' : 'Logger',
-    }
-AthFileMgr.register('Server', AthFileServer, AthFileServerProxy)
-
 

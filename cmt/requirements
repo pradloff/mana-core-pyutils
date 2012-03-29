@@ -43,42 +43,43 @@ private
 apply_pattern declare_python_modules files="*.py AthFile scripts"
 apply_pattern declare_scripts files="\
  -s=$(PyUtils_root)/bin \
+ abootstrap-wkarea.py \
+ acmd.py \
+ atl-gen-athena-d3pd-reader \
+ avn.py \
+ build_cmt_pkg_db.py \
  checkFile.py \
+ checkPlugins.py \
+ checkSG.py \
+ checkTP.py \
+ checkTag.py \
+ cmtClients.py \
+ diff-jobo-cfg.py \
+ diffConfigs.py \
  diffPoolFiles.py \
+ dlldep.py \
+ dso-stats.py \
+ dump-athfile.py \
+ filter-and-merge-d3pd.py \
+ gen-typereg-dso.py \
+ gen_klass.py \
+ get-tag-diff.py \
+ getTagDiff.py \
+ gprof2dot \
+ icython.py \
+ lstags \
  magnifyPoolFile.py \
  merge-poolfiles.py \
- checkPlugins.py \
- cmtClients.py \
- checkTP.py \
- checkSG.py \
- setupWorkArea.py \
- checkTag.py \
- getTagDiff.py \
- pyroot.py \
- print_auditor_callgraph.py \
- gen_klass.py \
- build_cmt_pkg_db.py \
- pool_insertFileToCatalog.py \
- pool_extractFileIdentifier.py \
- diffConfigs.py \
- vmem-sz.py \
- dlldep.py \
- gen-typereg-dso.py \
- dump-athfile.py \
- pkgco.py \
- icython.py \
- dso-stats.py \
- tabnanny-checker.py \
  pep8.py \
- get-tag-diff.py \
- avn.py \
- abootstrap-wkarea.py \
+ pkgco.py \
+ pool_extractFileIdentifier.py \
+ pool_insertFileToCatalog.py \
+ print_auditor_callgraph.py \
+ pyroot.py \
+ setupWorkArea.py \
+ tabnanny-checker.py \
  tcSubmitTag.py \
- acmd.py \
- diff-jobo-cfg.py \
- filter-and-merge-d3pd.py \
- lstags \
- atl-gen-athena-d3pd-reader \
+ vmem-sz.py \
 "
  
 end_private

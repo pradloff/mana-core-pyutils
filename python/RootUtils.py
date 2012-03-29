@@ -95,11 +95,20 @@ def root_compile(src=None, fname=None, batch=True):
 def _pythonize_tfile():
     import PyCintex; PyCintex.Cintex.Enable()
     root = import_root()
-    PyCintex.loadDict("RootUtilsPyROOTDict")
-    rootutils = getattr(root, "RootUtils")
-    pybytes = getattr(rootutils, "PyBytes")
-    read_root_file = getattr(rootutils, "_pythonize_read_root_file")
-    tell_root_file = getattr(rootutils, "_pythonize_tell_root_file")
+    import PyUtils.Helpers as H
+    with H.ShutUp(filters=[
+        re.compile(
+            'TClass::TClass:0: RuntimeWarning: no dictionary for.*'),
+        re.compile(
+            'Warning in <TEnvRec::ChangeValue>: duplicate entry.*'
+            ),
+        ]):
+        PyCintex.loadDict("RootUtilsPyROOTDict")
+        rootutils = getattr(root, "RootUtils")
+        pybytes = getattr(rootutils, "PyBytes")
+        read_root_file = getattr(rootutils, "_pythonize_read_root_file")
+        tell_root_file = getattr(rootutils, "_pythonize_tell_root_file")
+        pass
     def read(self, size=-1):
         """read([size]) -> read at most size bytes, returned as a string.
 

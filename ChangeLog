@@ -1,3 +1,16 @@
+2012-03-29  Sebastien Binet  <binet@cern.ch>
+
+	* tagging PyUtils-00-12-00
+	* needs AthenaCommon with modified ChapPy...
+	* remove multiprocessing usage from AthFile
+	* silence the TEnv warnings
+	* add gprof2dot
+	* M python/RootUtils.py
+	* M python/AthFile/__init__.py
+	* M python/AthFile/impl.py
+	* M cmt/requirements
+	* A bin/gprof2dot
+
 2012-03-19  Sebastien Binet  <sebastien.binet@cern.ch>
 
 	* tagging PyUtils-00-11-24

@@ -44,6 +44,8 @@ class ModuleFacade(types.ModuleType):
         self.__dict__['_tests'] = _tests
         self.__dict__['_impl']  = _impl
         self.__dict__['_guess_file_type'] = _guess_file_type
+
+        self.__dict__['server'] = _impl.AthFileServer()
         
         import atexit
         atexit.register(self.shutdown)
@@ -56,58 +58,11 @@ class ModuleFacade(types.ModuleType):
             return types.ModuleType.__getattribute__(self, k)
         return object.__getattribute__(self, k)
     
-    @property
-    def server(self):
-        if '_server' not in self.__dict__:
-            if imp.lock_held():
-                raise RuntimeError('cannot create an AthFile server while '
-                                   'a module is being imported...\n'
-                                   'this is a fundamental limitation. please '
-                                   'fix your joboptions.py file')
-            _srv = self.__dict__['_server'] = self._mgr.Server()
-            import os
-            _orig_setenv = self.__dict__['_old_os_setenv'] = os.environ.__setitem__
-            def _setenv(k, v):
-                """monkey patch os.environ.__setitem__ to transfer
-                the master process environment with the AthFileServer's one
-                """
-                _srv._setenv(k,v)
-                return _orig_setenv(k,v)
-            os.environ.__setitem__ = _setenv
-            
-        server = self.__dict__['_server']
-        if server._manager._state.value == server._manager._state.SHUTDOWN:
-            raise RuntimeError('AthFileServer already shutdown')
-        return server
-
     def restart_server(self):
-        server = self.__dict__['_server']
-        assert server._manager._state.value == server._manager._state.SHUTDOWN, \
-               "invalid server state (%s)" % (server._manager._state.value,)
-        del self.__dict__['_server']
-        del self.__dict__['_mgr_impl']
-        return self.server
+        return
     
-    @property
-    def _mgr(self):
-        if '_mgr_impl' not in self.__dict__:
-            mgr = self._impl.AthFileMgr()
-            mgr.start()
-            self.__dict__['_mgr_impl'] = mgr
-        return self.__dict__['_mgr_impl']
-
-    @_decos.memoize
     def shutdown(self):
-        if '_server' in self.__dict__:
-            #self.msg.info('shutting down athfile-server...')
-            try:
-                self.server._cleanup_pyroot()
-            except Exception:
-                pass
-            # restore the original os.environ.__setitem__ method
-            os.environ.__setitem__ = self.__dict__['_old_os_setenv']
-            del self.__dict__['_old_os_setenv']
-            return self._mgr.shutdown()
+        #self.server._cleanup_pyroot()
         return
     
     @property
