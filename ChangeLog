@@ -1,3 +1,8 @@
+2012-03-30  Frank Winklmeier  <fwinkl@cern>
+
+	* tagging PyUtils-00-12-01
+	* python/AmiLib.py (Client.find_pkg): Only show non-archived packages
+
 2012-03-29  Sebastien Binet  <binet@cern.ch>
 
 	* tagging PyUtils-00-12-00

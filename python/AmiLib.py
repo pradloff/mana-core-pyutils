@@ -189,9 +189,9 @@ class Client(object):
 
         args = {
             'glite': (
-                "select packages.path,packages.packageName "
+                "select packages.path,packages.packageName,packages.archive "
                 "where repositories.repositoryName='AtlasOfflineRepository' "
-                "and packages.packageName='%s'" % pkg
+                "and packages.packageName='%s' and packages.archive=0" % pkg
                 ),
             }
 
