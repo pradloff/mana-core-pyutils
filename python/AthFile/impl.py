@@ -897,6 +897,11 @@ class FilePeeker(object):
         if 'PYTHONINSPECT' in self._sub_env:
             del self._sub_env['PYTHONINSPECT']
 
+        # prevent from running athena with igprof
+        for k in ('LD_PRELOAD', 'IGPROF'):
+            if k in self._sub_env:
+                del self._sub_env[k]
+
     def _root_open(self, fname, raw=False):
         import PyUtils.Helpers as H
         with H.restricted_ldenviron(projects=['AtlasCore']):
@@ -907,7 +912,8 @@ class FilePeeker(object):
                 re.compile("Error in <T.*?File::Init>:.*? not a ROOT file")]):
                 # for AttributeListLayout which uses CINT for its dict...
                 # first try the APR version
-                if 0 != root.gSystem.Load('libRootCollection'):
+                ooo = root.gSystem.Load('libRootCollection')
+                if ooo < 0:
                     # then try the POOL one
                     root.gSystem.Load('liblcg_RootCollection')
                 if raw:
@@ -1019,7 +1025,7 @@ class FilePeeker(object):
                        file_name,]
                 subprocess.call(cmd, env=self._sub_env)
                 #
-                with H.restricted_ldenviron(projects=projects):
+                with H.restricted_ldenviron(projects=None):
                     is_tag, tag_ref, tag_guid, nentries, runs, evts = self._is_tag_file(f_root, evtmax)
                     if is_tag:
                         f['stream_names'] = ['TAG']
@@ -1070,7 +1076,12 @@ class FilePeeker(object):
                             }
                         import os
                         stdout = open('athfile-%i.log.txt' % os.getpid(), "a")
+                        print >> stdout,"="*80
+                        print >> stdout,self._sub_env
+                        print >> stdout,"="*80
+                        stdout.flush()
                         sc = app.run(stdout=stdout, env=self._sub_env)
+                        stdout.flush()
                         stdout.close()
                         import AthenaCommon.ExitCodes as ath_codes
                         if sc == 0:
@@ -1110,8 +1121,8 @@ class FilePeeker(object):
                                 raise IOError(sc, err)
                             msg.info('athena failed to initialize.')
                             msg.info('=> probably an empty input POOL file')
-                        if os.path.exists(out_pkl_fname):
-                            os.remove(out_pkl_fname)
+                        ## if os.path.exists(out_pkl_fname):
+                        ##     os.remove(out_pkl_fname)
                     # TAG-file
                     # app.exit()
             else: # bytestream

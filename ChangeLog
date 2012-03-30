@@ -1,3 +1,9 @@
+2012-03-30  Sebastien Binet  <binet@cern.ch>
+
+	* tagging PyUtils-00-12-02
+	* fix bug #92267: remove LD_PRELOAD from env for AthFile-subprocesses
+	* M python/AthFile/impl.py
+
 2012-03-30  Frank Winklmeier  <fwinkl@cern>
 
 	* tagging PyUtils-00-12-01
