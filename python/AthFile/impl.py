@@ -14,6 +14,7 @@ import os
 import subprocess
 import sys
 
+import PyUtils.Decorators as _decos
 import PyUtils.Helpers as H
 from PyUtils.Helpers    import ShutUp
 from .timerdecorator import timelimit, TimeoutError
@@ -289,7 +290,7 @@ class AthFileServer(object):
         import PyUtils.Logging as _L
         #self._msg = msg
         #self._msg = self._manager.msg()
-        self._msg = _get_msg()#_L.logging.getLogger("AthFile")
+        #self._msg = _get_msg()#_L.logging.getLogger("AthFile")
         #self._msg = mp.get_logger("AthFile")
         #self._msg.setFormat("Py:%(name)-14s%(levelname)8s %(message)s")
 
@@ -299,7 +300,7 @@ class AthFileServer(object):
         try:
             ru._pythonize_tfile()
         except Exception, err:
-            self._msg.warning('problem during TFile pythonization:\n%s', err)
+            self.msg().warning('problem during TFile pythonization:\n%s', err)
             
         #self.msg.info('importing ROOT... [done]')
 
@@ -328,12 +329,12 @@ class AthFileServer(object):
                 self._msg.info('could not close a TFile:\n%s', err)
                 pass
         tfiles[:] = []
-        
+
     def msg(self):
-        return self._msg
+        return _get_msg()#self._msg
     
     def set_msg_lvl(self, lvl):
-        self._msg.setLevel(lvl)
+        self.msg().setLevel(lvl)
         
     def _md5_for_file(self, f, block_size=2**20, do_fast_md5=True):
         """helper function to calculate a MD5 checksum
@@ -453,6 +454,8 @@ class AthFileServer(object):
         md5 = self._md5_for_file(fname)
         return md5
     
+    @_decos.forking
+    @timelimit(timeout=DEFAULT_AF_TIMEOUT)
     def fname(self, fname):
         """take a file name, return the pair (protocol, 'real' file name)
         """
@@ -580,8 +583,9 @@ class AthFileServer(object):
             msg.debug('reason:\n%s', err)
             pass
         return
-    
-    @timelimit(timeout=5)
+
+    # dead-lock on self.msg (I think!)...
+    #@timelimit(timeout=DEFAULT_AF_TIMEOUT)
     def load_cache(self, fname=DEFAULT_AF_CACHE_FNAME):
         """load file informations from a cache file.
         the back-end (JSON, ASCII, pickle, ...) is inferred from the
@@ -597,6 +601,7 @@ class AthFileServer(object):
             # illegal file...
             msg.info('load_cache: invalid file [%s]', fname)
             return
+
         ext = ext[1:] if ext[0]=='.' else ext
         try:
             loader = getattr(self, '_load_%s_cache'%ext)
@@ -604,6 +609,7 @@ class AthFileServer(object):
             msg.info('load_cache: could not find a suitable backend for '
                      'extension [.%s] => using [ascii]', ext)
             loader = self._load_ascii_cache
+
         try:
             search_path = os.environ.get('DATAPATH',os.getcwd())
             search_path = search_path.split(os.pathsep)
@@ -625,6 +631,8 @@ class AthFileServer(object):
         except Exception, err:
             msg.info("problem loading cache from [%s]!", fname)
             msg.info(repr(err))
+            pass
+        
         self._cache.update(cache)
         msg.debug('loading cache from [%s]... [done]', fname)
 
@@ -758,6 +766,8 @@ class AthFileServer(object):
         self._cache = {}
         return
 
+    @_decos.forking
+    @timelimit(timeout=DEFAULT_AF_TIMEOUT)
     def ftype(self, fname):
         """
         returns the type of a file ('pool' or 'bs') together with its
@@ -811,6 +821,8 @@ class AthFileServer(object):
         ftype = 'pool' if _is_root_file else 'bs'
         return (ftype, fname)
 
+    @_decos.forking
+    @timelimit(timeout=DEFAULT_AF_TIMEOUT)
     def exists(self, fname):
         """helper function to test if a fiven `fname` exists.
 

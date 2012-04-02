@@ -1,3 +1,11 @@
+2012-04-02  Sebastien Binet  <binet@cern.ch>
+
+	* tagging PyUtils-00-12-03
+	* fix bug #93259: dont use multiprocessing but still fork
+	* also install diff-athfile into InstallArea
+	* M python/AthFile/_init_.py
+	* M python/AthFile/impl.py
+
 2012-03-30  Sebastien Binet  <binet@cern.ch>
 
 	* tagging PyUtils-00-12-02
