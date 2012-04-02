@@ -100,7 +100,8 @@ class ModuleFacade(types.ModuleType):
     @property
     def tests(self):
         return self._tests
-    
+
+    @_decos.forking
     def fopen(self, fnames, evtmax=1):
         """
         helper function to create @c AthFile instances
