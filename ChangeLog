@@ -1,3 +1,9 @@
+2012-04-05  Graeme Andrew Stewart <graeme.andrew.stewart@cern.ch>
+    * tagging PyUtils-00-12-04
+    * add diffTAGFile.py script
+    * A bin/diffTAGFile.py
+
+
 2012-04-02  Sebastien Binet  <binet@cern.ch>
 
 	* tagging PyUtils-00-12-03
