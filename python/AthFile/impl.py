@@ -14,7 +14,6 @@ import os
 import subprocess
 import sys
 
-import PyUtils.Decorators as _decos
 import PyUtils.Helpers as H
 from PyUtils.Helpers    import ShutUp
 from .timerdecorator import timelimit, TimeoutError
@@ -454,7 +453,6 @@ class AthFileServer(object):
         md5 = self._md5_for_file(fname)
         return md5
     
-    @_decos.forking
     @timelimit(timeout=DEFAULT_AF_TIMEOUT)
     def fname(self, fname):
         """take a file name, return the pair (protocol, 'real' file name)
@@ -766,7 +764,6 @@ class AthFileServer(object):
         self._cache = {}
         return
 
-    @_decos.forking
     @timelimit(timeout=DEFAULT_AF_TIMEOUT)
     def ftype(self, fname):
         """
@@ -821,7 +818,6 @@ class AthFileServer(object):
         ftype = 'pool' if _is_root_file else 'bs'
         return (ftype, fname)
 
-    @_decos.forking
     @timelimit(timeout=DEFAULT_AF_TIMEOUT)
     def exists(self, fname):
         """helper function to test if a fiven `fname` exists.

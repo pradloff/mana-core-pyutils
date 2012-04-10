@@ -1,3 +1,11 @@
+2012-04-10  Sebastien Binet  <binet@cern.ch>
+
+	* tagging PyUtils-00-12-05
+	* change when forking happens to not lock in xrootd threads
+	* fixes bug #93510
+	* M python/AthFile/__init__.py
+	* M python/AthFile/impl.py
+
 2012-04-05  Graeme Andrew Stewart <graeme.andrew.stewart@cern.ch>
     * tagging PyUtils-00-12-04
     * add diffTAGFile.py script
