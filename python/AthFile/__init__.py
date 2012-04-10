@@ -85,17 +85,17 @@ class ModuleFacade(types.ModuleType):
     def flush_cache(self):
         return self.server.flush_cache
     
-    @property
-    def ftype(self):
-        return self.server.ftype
+    @_decos.forking
+    def ftype(self, fname):
+        return self.server.ftype(fname)
 
-    @property
-    def fname(self):
-        return self.server.fname
+    @_decos.forking
+    def fname(self, fname):
+        return self.server.fname(fname)
 
-    @property
-    def exists(self):
-        return self.server.exists
+    @_decos.forking
+    def exists(self, fname):
+        return self.server.exists(fname)
 
     @property
     def tests(self):
