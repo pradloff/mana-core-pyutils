@@ -429,10 +429,15 @@ def gen_source(clsname, outdir, obj):
             add_obj_impl.append(snippet)
         else:
             add_obj_impl_nidx.append(ii)
-        pass
+            pass
+        pass # loop over ovars
 
     for ii in add_obj_impl_nidx:
         v = ovars[ii]
+        if add_obj_impl_vidx is None:
+            # case for which a block has only a <prefix>_n or <prefix>_N
+            # but no other <prefix>_xyz branch
+            continue
         vv= ovars[add_obj_impl_vidx]
         snippet = textwrap.dedent(
             '''\
