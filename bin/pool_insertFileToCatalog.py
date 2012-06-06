@@ -42,7 +42,7 @@ def pool_insert(files, catalog_name="xmlcatalog_file:PoolFileCatalog.xml"):
     if sc != 0:
         print ":: problem running pool_insertFileToCatalog:"
         print out
-        return sc
+        return 2
 
     print out
     print ":: inserting [%i] files into pool catalog... [done]"%len(files)

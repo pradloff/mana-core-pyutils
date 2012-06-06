@@ -1031,7 +1031,27 @@ class FilePeeker(object):
                 #        PyCmt.Cmt:subprocess.getstatusoutput
                 cmd = ['pool_insertFileToCatalog.py',
                        file_name,]
-                subprocess.call(cmd, env=self._sub_env)
+                import tempfile
+                fd_errlog,out_errlog_name = tempfile.mkstemp(suffix='.log.txt')
+                os.close(fd_errlog)
+                try:
+                    os.remove(out_errlog_name)
+                except:
+                    pass
+                errlog = open(out_errlog_name, 'w')
+                sc = subprocess.call(cmd,
+                                     env=self._sub_env,
+                                     stdout=errlog,
+                                     stderr=subprocess.PIPE)
+                errlog.flush()
+                errlog.close()
+                errlog = open(out_errlog_name, 'r')
+                if sc != 0:
+                    raise RuntimeError(
+                        "could not insert file [%s] into PoolFileCatalog:\n%s" %
+                        (fname, ''.join(errlog.readlines()))
+                        )
+                errlog.close()
                 #
                 with H.restricted_ldenviron(projects=None):
                     is_tag, tag_ref, tag_guid, nentries, runs, evts = self._is_tag_file(f_root, evtmax)
