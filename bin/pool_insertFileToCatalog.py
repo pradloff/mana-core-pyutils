@@ -36,7 +36,8 @@ def pool_insert(files, catalog_name="xmlcatalog_file:PoolFileCatalog.xml"):
         
     out = os.linesep.join(
         [o for o in out.splitlines()
-         if not o.startswith("Warning in <TClass::TClass>: no dictionary for class ")]
+         if not (o.startswith("Warning in <TClass::TClass>: no dictionary for class ") or
+                 o.startswith('Warning in <TEnvRec::ChangeValue>: duplicate entry'))]
         )
 
     if sc != 0:
