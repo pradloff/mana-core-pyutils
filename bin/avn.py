@@ -34,7 +34,7 @@ import re
 import string
 import subprocess
 
-tagchars = string.ascii_letters + string.digits + '-'
+tagchars = string.ascii_letters + string.digits + '-' + '_'
 
 # patterns taken from atlas svn-hooks...
 _is_tag_name_valid_tc = re.compile("(^[A-Za-z_]+-[A-Za-z_]+-[0-9]{2}-[0-9]{2}-[0-9]{2}$)|(^[A-Za-z_]+-[A-Za-z_]+-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}$)").match

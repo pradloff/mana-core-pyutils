@@ -1,3 +1,9 @@
+2012-07-02  Sebastien Binet  <binet@cern.ch>
+
+	* tagging PyUtils-00-12-10
+	* fixing bug #95748: add _ to the allowed list of tag characters
+	* M bin/avn.py
+
 2012-06-07  Sebastien Binet  <binet@cern.ch>
 
 	* tagging PyUtils-00-12-09
