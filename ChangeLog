@@ -1,3 +1,9 @@
+2012-07-09  Sebastien Binet  <binet@cern.ch>
+
+	* tagging PyUtils-00-12-11
+	* adding optional protobuf generation for d3pd (experimental)
+	* M bin/atl-gen-athena-d3pd-reader
+
 2012-07-02  Sebastien Binet  <binet@cern.ch>
 
 	* tagging PyUtils-00-12-10

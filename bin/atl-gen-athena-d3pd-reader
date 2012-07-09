@@ -98,6 +98,67 @@ def gen_fctname(n):
         n = "x"+n
     return n
 
+def pbuf_is_cont(v):
+    tcle = ROOT.TClassEdit
+    if isinstance(v, basestring):
+        n = v
+    else:
+        n = v.type()
+        pass
+    return _is_vect_of_vect(n)
+
+def pbuf_normalize_type(v):
+    tcle = ROOT.TClassEdit
+    if isinstance(v, basestring):
+        n = v
+    else:
+        n = v.type()
+    is_cont = pbuf_is_cont(n)
+    inner = tcle.ShortType(n, tcle.kDropDefaultAlloc|tcle.kInnerClass)
+    if is_cont:
+        return pbuf_normalize_type(inner)
+    n = normalize_type(inner)
+    return cxx_to_pbuf(n)
+
+def cxx_to_pbuf(n):
+    return {
+        'double': 'double',
+        'float': 'float',
+        'int': 'int32',
+        'long': 'int64',
+        'long int': 'int64',
+        'unsigned int': 'uint32',
+        'unsigned long': 'uint64',
+        'unsigned long int': 'uint64',
+        'long long': 'int64',
+        'unsigned long long': 'uint64',
+        'bool': 'bool',
+        'std::string': 'string',
+        'const char*': 'string',
+        'char*': 'string',
+        'short': 'int32',           # FIXME ?!
+        'unsigned short': 'uint32', # FIXME ?!
+        }.get(n, n)
+
+def pbuf_pluralize(n, is_cont):
+    if is_cont:
+        # pluralize
+        if n.endswith('y'):
+            n = n[:-1] + "ies"
+        elif n.endswith("s"):
+            n = n + "es"
+        else:
+            n = n + "s"
+    return n
+    
+def pbuf_gen_varname(v):
+    n = gen_varname(v.name())
+    if n.startswith("m_"):
+        n = n[len("m_"):]
+    is_cont = _is_vect_of_vect(v.type())
+    n = pbuf_pluralize(n,is_cont)
+    return n
+
 def gen_header(clsname, outdir, obj):
     fname = os.path.join(outdir, clsname+".h")
     if not os.path.exists(outdir):
@@ -512,8 +573,119 @@ def gen_source(clsname, outdir, obj):
     f.flush()
     return
 
+def gen_protobuf(clsname, outdir, obj):
+    if clsname.endswith("D3PDObject"):
+        clsname = clsname[:-len("D3PDObject")]
+    fname = os.path.join(outdir, clsname+".proto")
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
+        pass
 
-def process(fnames, output):
+    # file already exists...
+    if os.path.exists(fname):
+        return
+    
+    f = open(fname, "w")
+    vardict = {
+        'classname' : clsname,
+        }
+
+    print >> f, "package atlas.d3pd;\n"
+    print >> f, "message %(classname)s\n{" % vardict
+    ovars = ROOT.D3PDMakerReaderDict.to_vector(obj.variables())
+    id_nbr = 0
+    for v in ovars:
+        id_nbr += 1
+        is_cont = pbuf_is_cont(v.type())
+        print >> f, \
+        "%(indent)s%(repeated)s %(cls_var_type)s %(cls_var_name)s = %(id)s;" \
+        % {
+            'indent': " "*4,
+            'repeated': 'optional' if not is_cont else 'repeated',
+            'cls_var_type': pbuf_normalize_type(v),
+            'cls_var_name': pbuf_gen_varname(v),
+            'id': id_nbr,
+            }
+    
+    print >> f, "} // message %(classname)s\n\n//EOF" % vardict
+    f.flush()
+    f.close()
+    return
+
+def gen_protobuf_evt(evt_block_descr, outdir):
+    clsname = "Event"
+    fname = os.path.join(outdir, clsname+".proto")
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
+        pass
+
+    # file already exists...
+    if os.path.exists(fname):
+        return 1
+
+    f = open(fname, "w")
+    vardict = {
+        'classname' : clsname,
+        }
+
+    print >> f, "package atlas.d3pd;\n"
+    for v in evt_block_descr.values():
+        print >> f, 'import "%s.proto";' % v['type']
+    else:
+        print >> f, ""
+    print >> f, "message %(classname)s\n{" % vardict
+    id_cnt = 0
+    for k,v in evt_block_descr.items():
+        id_cnt += 1
+        is_cont = v['is_cont']
+        var_name = k[1]
+        if k[0] != '':
+            var_name = k[0]
+            if var_name.endswith('_'):
+                var_name = var_name[:-len("_")]
+            var_name = pbuf_pluralize(var_name, is_cont)
+        print >> f, \
+    "%(indent)s%(repeated)s %(var_type)s %(var_name)s = %(id)s;" \
+    % {
+        'indent': " "*4,
+        'repeated': 'optional' if not is_cont else 'repeated',
+        'var_type': v['type'],
+        'var_name': var_name,
+        'id': id_cnt,
+        }
+        pass
+    print >> f, "} // message %(classname)s\n\n//EOF" % vardict
+    f.flush()
+    f.close()
+    return 0
+
+def run_protobuf(output):
+    orig_dir = os.getcwd()
+    try:
+        os.chdir(output)
+        import commands, glob
+        rc, pbuf_bin = commands.getstatusoutput("which protoc")
+        if rc:
+            print "** pb while fetching protobuf compiler:\n%s" % pbuf_bin
+            return rc
+        print ":: protobuf compiler: [%s]" % pbuf_bin
+        pbuf_files = glob.glob("*.proto")
+        for pbuf_file in pbuf_files:
+            cmd = " ".join([
+                pbuf_bin, "-I.",
+                "--cpp_out=.", #"-o", pbuf_file[:-len(".proto")]+".pb.cxx",
+                pbuf_file,
+                ])
+            #print "-->",cmd
+            rc, out = commands.getstatusoutput(cmd)
+            if rc:
+                print "** pb while running protoc on [%s]" % pbuf_file
+                print out
+                return rc
+    finally:
+        os.chdir(orig_dir)
+    
+def process(fnames, output, do_gen_protobuf=False):
     import PyCintex; PyCintex.Cintex.Enable()
     global ROOT
     import PyUtils.RootUtils as ru
@@ -548,6 +720,7 @@ def process(fnames, output):
 
     merged_objs = merge_objects(objects.values())
 
+    evt_block_descr = {}
     # generate the sources for each object
     for obj in merged_objs:
         ovars = ROOT.D3PDMakerReaderDict.to_vector(obj.variables())
@@ -562,7 +735,30 @@ def process(fnames, output):
         if gen_source(obj.name(), output, obj):
             print "** pb while generating source for [%s]" % obj.name()
             return 1
-            
+        # generate protobuf files
+        if do_gen_protobuf:
+            if gen_protobuf(obj.name(), output, obj):
+                print "** pb while generating protobuf for [%s]" % obj.name()
+                return 1
+            pbuf_evt_type = obj.name()
+            if pbuf_evt_type.endswith("D3PDObject"):
+                pbuf_evt_type = pbuf_evt_type[:-len("D3PDObject")]
+            pbuf_evt_name = pbuf_pluralize(pbuf_evt_type, obj.container())
+            evt_block_descr[(obj.prefix(), pbuf_evt_name)] = {
+                'type': pbuf_evt_type,
+                'is_cont': obj.container(),
+                }
+            if 0:
+                print obj.name(), "prefix='%s'"%obj.prefix(),
+                print 'container:',obj.container()
+
+    if do_gen_protobuf:
+        if gen_protobuf_evt(evt_block_descr, output):
+            print "** pb while generating protobuf for [Event]"
+            return 1
+        if run_protobuf(output):
+            print "** pb while generating c++ files from .proto"
+            return 1
     return 0
 
 def main():
@@ -574,6 +770,11 @@ def main():
                         type=str,
                         nargs='+',
                         help='input d3pd files')
+    parser.add_argument('--protobuf',
+                        default=False,
+                        action='store_true',
+                        help='switch to enable protobuf files generation.'
+                        )
     parser.add_argument('--output-dir', '-o',
                         type=str,
                         default='code',
@@ -585,7 +786,7 @@ def main():
     for f in args.fnames:
         print ":: - %s" % f
         pass
-    sc = process(args.fnames, args.output_dir)
+    sc = process(args.fnames, args.output_dir, args.protobuf)
     print ":: done [sc=%s]" % sc
     print ":"*80
     return sc
