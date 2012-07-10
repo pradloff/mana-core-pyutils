@@ -621,6 +621,7 @@ def gen_protobuf_evt(evt_block_descr, outdir):
 
     # file already exists...
     if os.path.exists(fname):
+        print "** error: file [%s] exists !" % fname
         return 1
 
     f = open(fname, "w")
@@ -684,7 +685,8 @@ def run_protobuf(output):
                 return rc
     finally:
         os.chdir(orig_dir)
-    
+    return 0
+
 def process(fnames, output, do_gen_protobuf=False):
     import PyCintex; PyCintex.Cintex.Enable()
     global ROOT
