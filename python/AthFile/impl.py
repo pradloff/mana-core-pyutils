@@ -18,6 +18,14 @@ import PyUtils.Helpers as H
 from PyUtils.Helpers    import ShutUp
 from .timerdecorator import timelimit, TimeoutError
 
+# see bug #95942 for the excruciating details
+try:
+    from AthenaCommon.Include import excludeTracePattern
+    excludeTracePattern.append("*cache.ascii.gz")
+    del excludeTracePattern
+except:
+    pass
+
 ### globals -------------------------------------------------------------------
 DEFAULT_AF_CACHE_FNAME = os.environ.get('DEFAULT_AF_CACHE_FNAME',
                                         'athfile-cache.ascii.gz')

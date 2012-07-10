@@ -1,3 +1,9 @@
+2012-07-10  Sebastien Binet  <binet@cern.ch>
+
+	* tagging PyUtils-00-12-12
+	* fixing bug #95942 following the good advice of wim
+	* M python/AthFile/impl.py
+
 2012-07-09  Sebastien Binet  <binet@cern.ch>
 
 	* tagging PyUtils-00-12-11
