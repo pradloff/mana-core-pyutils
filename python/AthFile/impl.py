@@ -78,6 +78,20 @@ def _find_file(filename, pathlist, access):
     # no such accessible file avalailable
     return None
 
+def _setup_ssl(msg, root):
+    x509_proxy = os.environ.get('X509_USER_PROXY', '')
+    if x509_proxy:
+        # setup proper credentials
+        root.TSSLSocket.SetUpSSL(
+            x509_proxy,
+            "/etc/grid-security/certificates",
+            x509_proxy,
+            x509_proxy)
+    else:
+        msg.warning("protocol https is requested but no X509_USER_PROXY was found! (opening the file might fail.)")
+        pass
+    return
+    
 def _create_file_infos():
     """simple helper function to create consistent dicts for the
     fileinfos attribute of AthFile
@@ -391,7 +405,13 @@ class AthFileServer(object):
                     'Warning in <TEnvRec::ChangeValue>: duplicate entry.*'
                     ),
                 ]):
-                f = self.pyroot.TFile.Open(fname+"?filetype=raw", "read")
+                root_open = self.pyroot.TFile.Open
+                protocol, _ = self.fname(fname)
+                if protocol == 'https':
+                    _setup_ssl(self.msg, self.pyroot)
+                    root_open = self.pyroot.TWebFile
+                    pass
+                f = root_open(fname+"?filetype=raw", "read")
                 if f is None or not f:
                     raise IOError(errno.ENOENT, 'No such file or directory',
                                   fname)
@@ -500,7 +520,7 @@ class AthFileServer(object):
             fname = _normalize(url.path)
             fname = protocol+':'+fname
 
-        elif protocol in ('root','dcap', 'dcache', 'http'):
+        elif protocol in ('root','dcap', 'dcache', 'http', 'https'):
             #fname = fname
             pass
 
@@ -851,6 +871,7 @@ class AthFileServer(object):
 
         def _root_exists(fname):
             exists = False
+            f = None
             try:
                 f = self._root_open(fname)
                 exists = f and f.IsOpen()
@@ -932,10 +953,18 @@ class FilePeeker(object):
                 if ooo < 0:
                     # then try the POOL one
                     root.gSystem.Load('liblcg_RootCollection')
+                root_open = root.TFile.Open
+
+                # we need to get back the protocol b/c of the special
+                # case of secure-http which needs to open TFiles as TWebFiles...
+                protocol, _ = self.server.fname(fname)
+                if protocol == 'https':
+                    _setup_ssl(self.msg(), root)
+                    root_open = root.TWebFile
                 if raw:
-                    f = root.TFile.Open(fname+'?filetype=raw', 'READ')
+                    f = root_open(fname+'?filetype=raw', 'READ')
                 else:
-                    f = root.TFile.Open(fname, 'READ')
+                    f = root_open(fname, 'READ')
                 if f is None or not f:
                     raise IOError(errno.ENOENT,
                                   'No such file or directory',
@@ -1016,6 +1045,7 @@ class FilePeeker(object):
         msg = self.msg()
         import PyUtils.Helpers as H
         f = _create_file_infos()
+        protocol, _ = self.server.fname(fname)
         f_raw  = self._root_open(fname, raw=True)
         if f_raw is None or not f_raw:
             raise IOError(
@@ -1128,8 +1158,8 @@ class FilePeeker(object):
                                 %s
                                 logfile: [%s]
                                 """% (":"*25,
-                                      sc,errno.errorcode[sc],
-                                      ath_codes.codes[sc],
+                                      sc,errno.errorcode.get(sc,sc),
+                                      ath_codes.codes.get(sc,sc),
                                       ":"*25,
                                       stdout.name
                                       ))
