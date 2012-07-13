@@ -1,3 +1,11 @@
+2012-07-13  Sebastien Binet  <binet@cern.ch>
+
+	* tagging PyUtils-00-12-14
+	* fix bug #94458: implement a mode=summary and mode=detailed
+	  switch to limit the amount of output for hugely different files.
+	  mode=detailed is kept as the default.
+	* M python/scripts/diff_root_files.py
+
 2012-07-11  Sebastien Binet  <binet@cern.ch>
 
 	* tagging PyUtils-00-12-13

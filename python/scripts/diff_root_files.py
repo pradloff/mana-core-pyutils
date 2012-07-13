@@ -12,9 +12,17 @@ import PyUtils.acmdlib as acmdlib
 import PyUtils.RootUtils as ru
 ROOT = ru.import_root()
 
+### globals -------------------------------------------------------------------
+g_ALLOWED_MODES = ('summary', 'detailed')
+g_args = None
+
 ### classes -------------------------------------------------------------------
 
 ### functions -----------------------------------------------------------------
+def _is_summary():
+    global g_args
+    return g_args.mode == 'summary'
+
 @acmdlib.command(name='diff-root')
 @acmdlib.argument('old',
                   help='path to the reference ROOT file to analyze')
@@ -42,10 +50,23 @@ ROOT = ru.import_root()
                   action='store_true',
                   default=False,
                   help="""Enable verbose printout""")
+@acmdlib.argument('--mode',
+                  choices=g_ALLOWED_MODES,
+                  default='detailed',
+                  help="""\
+Enable a particular mode.
+  'summary': only report the number of differences.
+  'detailed': display everything.
+default='%(default)s'.
+allowed: %(choices)s
+"""
+                  )
 def main(args):
     """check that 2 ROOT files have same content (containers and sizes)
     """
-
+    global g_args
+    g_args = args
+    
     import PyUtils.RootUtils as ru
     root = ru.import_root()
 
@@ -61,12 +82,16 @@ def main(args):
     msg.info(' new: [%s]', args.new)
     msg.info('ignore  leaves: %s', args.ignore_leaves)
     msg.info('enforce leaves: %s', args.enforce_leaves)
-    msg.info('hacks:   %s', args.known_hacks)
-    msg.info('entries: %s', args.entries)
-    
-    fold = ru.RootFileDumper(args.old, args.tree_name)
-    fnew = ru.RootFileDumper(args.new, args.tree_name)
+    msg.info('hacks:          %s', args.known_hacks)
+    msg.info('entries:        %s', args.entries)
+    msg.info('mode:           %s', args.mode)
 
+    import PyUtils.Helpers as H
+    with H.ShutUp() :
+        fold = ru.RootFileDumper(args.old, args.tree_name)
+        fnew = ru.RootFileDumper(args.new, args.tree_name)
+        pass
+    
     def tree_infos(tree, args):
         nentries = tree.GetEntriesFast()
         leaves = [l.GetName() for l in tree.GetListOfLeaves()
@@ -131,8 +156,12 @@ def main(args):
 
             in_synch = d[0][:-1] == d[1][:-1]
             if not in_synch:
-                print '::sync-old %s' % '.'.join(["%03i"%ientry]+map(str, d[0][2]))
-                print '::sync-new %s' % '.'.join(["%03i"%ientry]+map(str, d[1][2]))
+                if not _is_summary():
+                    print '::sync-old %s' % \
+                          '.'.join(["%03i"%ientry]+map(str, d[0][2]))
+                    print '::sync-new %s' % \
+                          '.'.join(["%03i"%ientry]+map(str, d[1][2]))
+                    pass
                 summary[name[0]] += 1
                 # remember for later
                 fold.allgood = False
@@ -146,7 +175,9 @@ def main(args):
                 diff_value = '%.8f%%' % (diff_value,)
             except Exception:
                 pass
-            print '%s %r -> %r => diff= [%s]' %(n, iold, inew, diff_value)
+            if not _is_summary():
+                print '%s %r -> %r => diff= [%s]' %(n, iold, inew, diff_value)
+                pass
             summary[name[0]] += 1
 
             if name[0] in args.enforce_leaves:
@@ -158,10 +189,12 @@ def main(args):
         msg.info('Found [%s] identical leaves', n_good)
         msg.info('Found [%s] different leaves', n_bad)
 
-        keys = sorted(summary.keys())
-        for n in keys:
-            v = summary[n]
-            msg.info(' [%s]: %i leaves differ', n, v)
+        if not _is_summary():
+            keys = sorted(summary.keys())
+            for n in keys:
+                v = summary[n]
+                msg.info(' [%s]: %i leaves differ', n, v)
+                pass
             pass
         
         if (not fold.allgood) or (not fnew.allgood):
@@ -173,5 +206,7 @@ def main(args):
     
     ndiff = diff_tree(fold, fnew, args)
     if ndiff != 0:
+        msg.info('files differ!')
         return 2
+    msg.info('all good.')
     return 0
