@@ -27,6 +27,15 @@ import impl as _impl
 import tests as _tests
 AthFile = _impl.AthFile
 
+from PyCmt.decorator import decorator as _dec
+@_dec
+def _update_cache(fct, *args):
+    res = fct(*args)
+    import PyUtils.AthFile as af
+    if af.server._do_pers_cache:
+        af.server.load_cache()
+    return res
+
 ### classes -------------------------------------------------------------------
 import types
 class ModuleFacade(types.ModuleType):
@@ -101,7 +110,8 @@ class ModuleFacade(types.ModuleType):
     def tests(self):
         return self._tests
 
-    @_decos.forking
+    @_update_cache  # also decorate with _update_cache to pick-up the changes 
+    @_decos.forking # from the forked athfile server...
     def fopen(self, fnames, evtmax=1):
         """
         helper function to create @c AthFile instances

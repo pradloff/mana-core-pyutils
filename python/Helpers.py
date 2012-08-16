@@ -23,7 +23,9 @@ class ShutUp(object):
         ]
     def __init__(self, filters = DefaultFilter):
         self._dummy = False # if dummy, we don't really shut-up ROOT...
-
+        if os.environ.get('PYUTILS_SHUTUP_DEBUG', '0') == '1':
+            self._dummy = True
+            
         self.save_err  = open( '/dev/null', 'w' )
         self.save_out  = open( '/dev/null', 'w' )
         try:

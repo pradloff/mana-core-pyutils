@@ -1,3 +1,18 @@
+2012-08-16  Sebastien Binet  <binet@cern.ch>
+
+	* tagging PyUtils-00-12-15
+	* correctly pick-up changes from athfile forked subprocess
+	the bug was introduced with the refactoring from -00-12-03.
+	as the peeking was not in the same process, the parent process
+	was keeping its own cache, overriding whatever the subprocess had
+	put in the persistent athfile.cache file.
+	* introduce 2 new (debugging) env. vars:
+	  - ATHFILE_DEBUG=1 -> set athfile.msg.level == VERBOSE
+	  - PYUTILS_SHUTUP_DEBUG=1 -> display filtered out messages (ROOT,...)
+	* M python/Helpers.py
+	* M python/AthFile/__init__.py
+	* M python/AthFile/impl.py
+
 2012-07-13  Sebastien Binet  <binet@cern.ch>
 
 	* tagging PyUtils-00-12-14

@@ -30,7 +30,7 @@ except:
 DEFAULT_AF_CACHE_FNAME = os.environ.get('DEFAULT_AF_CACHE_FNAME',
                                         'athfile-cache.ascii.gz')
 
-DEFAULT_AF_TIMEOUT = 10
+DEFAULT_AF_TIMEOUT = 20
 '''Default timeout for commands to be completed.'''
 
 ### utils ----------------------------------------------------------------------
@@ -295,27 +295,22 @@ class AthFile (object):
     
     pass # AthFile class
 
-def _get_msg(name="AthFile"):
-    import PyUtils.Logging as _L
-    msg = _L.logging.getLogger(name)
-    msg.setLevel(_L.logging.INFO)
-    return msg
-
 class AthFileServer(object):
     """the object serving AthFile requests
     """
     
     def __init__(self):
 
-        #global msg
         import PyUtils.Logging as _L
-        #self._msg = msg
-        #self._msg = self._manager.msg()
-        #self._msg = _get_msg()#_L.logging.getLogger("AthFile")
-        #self._msg = mp.get_logger("AthFile")
-        #self._msg.setFormat("Py:%(name)-14s%(levelname)8s %(message)s")
-
-        #self.msg.info('importing ROOT...')
+        self._msg = _L.logging.getLogger("AthFile")
+        self.set_msg_lvl(_L.logging.INFO)
+        
+        if os.environ.get('ATHFILE_DEBUG', '0') == '1':
+            import PyUtils.Logging as _L
+            self.set_msg_lvl(_L.logging.VERBOSE)
+            pass
+        
+        self.msg().debug('importing ROOT...')
         import PyUtils.RootUtils as ru
         self.pyroot = ru.import_root()
         try:
@@ -323,13 +318,12 @@ class AthFileServer(object):
         except Exception, err:
             self.msg().warning('problem during TFile pythonization:\n%s', err)
             
-        #self.msg.info('importing ROOT... [done]')
+        self.msg().debug('importing ROOT... [done]')
 
         # a cache of already processed requests
         self._cache = {}
         self._do_pers_cache = True
         self.enable_pers_cache()
-
         return
 
     # make the _peeker on-demand to get an up-to-date os.environ
@@ -352,7 +346,7 @@ class AthFileServer(object):
         tfiles[:] = []
 
     def msg(self):
-        return _get_msg()#self._msg
+        return self._msg
     
     def set_msg_lvl(self, lvl):
         self.msg().setLevel(lvl)
@@ -431,14 +425,17 @@ class AthFileServer(object):
             protocol, fname = self.fname(fname)
 
         use_cache = False
+        sync_cache = True
         if protocol in ('', 'file'):
             fid = self.md5sum(fname)
             if fid in cache:
                 use_cache = True
-                msg.debug('fetched [%s] from cache', fname)
+                sync_cache = False
+                msg.debug('fetched [%s] from cache (md5sum is a match)', fname)
                 f = self._cache[cache[fid]]
         elif protocol in ('ami',):
             use_cache = True
+            sync_cache = True # yes, we want to update the pers. cache
             # take data from AMI
             infos = ami_dsinfos(fname[len('ami://'):])
             msg.debug('fetched [%s] from cache', fname)
@@ -455,6 +452,7 @@ class AthFileServer(object):
             # change very often.
             if fname in self._cache:
                 use_cache = True
+                sync_cache = False
                 msg.debug('fetched [%s] from cache', fname)
                 f = self._cache[fname]
 
@@ -465,11 +463,15 @@ class AthFileServer(object):
             self._cache[fname] = f
             # hysteresis...
             self._cache[infos['file_name']] = f
+            sync_cache = True
 
-        try:
-            self._sync_pers_cache()
-        except Exception,err:
-            msg.info('could not synchronize the persistent cache:\n%s', err)
+        if sync_cache:
+            try:
+                self._sync_pers_cache()
+            except Exception,err:
+                msg.info('could not synchronize the persistent cache:\n%s', err)
+            pass
+        
         return f
     
     def md5sum(self, fname):
@@ -546,6 +548,8 @@ class AthFileServer(object):
             msg.warning('unknown protocol [%s]. we\'ll just return our input',
                         protocol)
             #fname = fname
+            pass
+        
         return (protocol, fname)
 
     def cache(self):
@@ -599,10 +603,13 @@ class AthFileServer(object):
             pid_fname = fname_ + '.' + pid + fname_ext
         msg.debug('synch-ing cache to [%s]...', fname)
         try:
+            msg.debug('writing to [%s]...', pid_fname)
             self.save_cache(pid_fname)
             if os.path.exists(pid_fname):
                 # should be atomic on most FS...
-                os.rename(pid_fname, fname) 
+                os.rename(pid_fname, fname)
+            else:
+                msg.warning("could not save to [%s]", pid_fname)
             msg.debug('synch-ing cache to [%s]... [done]', fname)
         except Exception,err:
             msg.debug('synch-ing cache to [%s]... [failed]', fname)
@@ -658,7 +665,7 @@ class AthFileServer(object):
             msg.info("problem loading cache from [%s]!", fname)
             msg.info(repr(err))
             pass
-        
+
         self._cache.update(cache)
         msg.debug('loading cache from [%s]... [done]', fname)
 
@@ -690,7 +697,8 @@ class AthFileServer(object):
                 msg.info('could not save cache in [%s]', fname)
         except Exception,err:
             msg.warning('could not save cache into [%s]:\n%s', fname, err)
-        
+        return
+    
     def _load_pkl_cache(self, fname):
         """load file informations from pickle/shelve 'fname'"""
         try: import cPickle as pickle
@@ -763,10 +771,9 @@ class AthFileServer(object):
                        width=120)
                 fd.flush()
                 print >> fd, ", "
-            fd.flush()
             print >> fd, "]"
             print >> fd, "### EOF ###"
-            
+            fd.flush()
         return
     
     def _load_db_cache(self, fname):
