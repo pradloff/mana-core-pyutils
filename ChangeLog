@@ -1,3 +1,9 @@
+2012-08-17  Sebastien Binet  <binet@cern.ch>
+
+	* tagging PyUtils-00-12-16
+	* correctly handle the case when there is no pre-existing athfile cache
+	* M python/AthFile/__init__.py
+
 2012-08-16  Sebastien Binet  <binet@cern.ch>
 
 	* tagging PyUtils-00-12-15

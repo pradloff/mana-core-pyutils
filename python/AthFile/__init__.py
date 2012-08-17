@@ -33,7 +33,10 @@ def _update_cache(fct, *args):
     res = fct(*args)
     import PyUtils.AthFile as af
     if af.server._do_pers_cache:
-        af.server.load_cache()
+        try:
+            af.server.load_cache()
+        except Exception:
+            pass
     return res
 
 ### classes -------------------------------------------------------------------
