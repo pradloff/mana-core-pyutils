@@ -1,3 +1,10 @@
+2012-09-03  Sebastien Binet  <binet@cern.ch>
+
+	* tagging PyUtils-00-12-17
+	* fixing bug #96214: swallow config parser errors in face of
+	  asetup epilog non-configparser conformant sections.
+	* M bin/setupWorkArea.py
+
 2012-08-17  Sebastien Binet  <binet@cern.ch>
 
 	* tagging PyUtils-00-12-16

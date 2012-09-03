@@ -237,7 +237,10 @@ def _processOptions( useropts, userlongopts ):
        if os.path.exists('.asetup.save'):
           import ConfigParser as _cp
           cfg = _cp.SafeConfigParser()
-          cfg.read(['.asetup.save'])
+          try:
+             cfg.read(['.asetup.save'])
+          except _cp.ParsingError, err:
+             log.info('got these non-fatal parsing errors:\n%s' % err)
           if (cfg.has_section('summary') and
               cfg.has_option('summary', 'AtlasProject')):
              v = cfg.get('summary', 'AtlasProject')
