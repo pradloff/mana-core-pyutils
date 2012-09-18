@@ -1,3 +1,9 @@
+2012-09-18  Sebastien Binet  <binet@voatlas04.cern.ch>
+
+	* tagging PyUtils-00-12-18
+	* remove additional .root when creating empty output ROOT files
+	* M bin/filter-and-merge-d3pd.py
+
 2012-09-03  Sebastien Binet  <binet@cern.ch>
 
 	* tagging PyUtils-00-12-17
