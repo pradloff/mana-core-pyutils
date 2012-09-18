@@ -41,7 +41,7 @@ def _fnmatch(fname, patterns):
     return False
 
 def _make_fake_output(fname, tree_name, tree_title=None):
-    f = ROOT.TFile.Open(fname+".root", "recreate")
+    f = ROOT.TFile.Open(fname, "recreate")
     if tree_title is None:
         tree_title = tree_name
     t = ROOT.TTree(tree_name, tree_title)
