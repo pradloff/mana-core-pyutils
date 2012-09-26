@@ -1,3 +1,9 @@
+2012-09-26  Sebastien Binet  <binet@voatlas04.cern.ch>
+
+	* tagging PyUtils-00-10-50-12
+	* obo Peter vG: forward compat with Pool files created with rel17
+	* M python/PoolFile.py
+
 2011-08-05  Sebastien Binet  <binet@voatlas51.cern.ch>
 
 	* tagging PyUtils-00-10-50-11
