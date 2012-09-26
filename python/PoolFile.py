@@ -412,7 +412,8 @@ class PoolOpts(object):
 
     @classmethod
     def isDataHeader(cls, name):
-        return name == PoolOpts.POOL_HEADER+"DataHeader"
+        return ( name == PoolOpts.POOL_HEADER+"DataHeader" ) or \
+               ( name == "POOLContainer(DataHeader)" )
 
     @classmethod
     def isEventData(cls, name):
@@ -623,7 +624,11 @@ class PoolFile(object):
         if dhKey:
             nEntries = dhKey.ReadObj().GetEntries()
         else:
-            nEntries = 0
+            dhKey = self.poolFile.FindKey( "POOLContainer(DataHeader)" )
+            if dhKey:
+                nEntries = dhKey.ReadObj().GetEntries()
+            else:
+                nEntries = 0
 
         keys = []
         containers = []
@@ -647,7 +652,10 @@ class PoolFile(object):
                 continue
 
             if PoolOpts.isDataHeader(name):
-                contName     = name.replace( PoolOpts.POOL_HEADER, "" )
+                if name == PoolOpts.POOL_HEADER:
+                    contName     = name.replace( PoolOpts.POOL_HEADER, "" )
+                else:
+                    contName     = "DataHeader"
                 memSize      = tree.GetTotBytes() / Units.kb
                 diskSize     = tree.GetZipBytes() / Units.kb
                 memSizeNoZip = 0.0
