@@ -413,7 +413,7 @@ class PoolOpts(object):
     @classmethod
     def isDataHeader(cls, name):
         return ( name == PoolOpts.POOL_HEADER+"DataHeader" ) or \
-               ( name == "POOLContainer(DataHeader)" )
+               ( name == "POOLContainer" )
 
     @classmethod
     def isEventData(cls, name):
