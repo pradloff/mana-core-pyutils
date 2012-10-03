@@ -99,6 +99,7 @@ def _create_file_infos():
     d = {
         'file_md5sum': None,
         'file_name': None,
+        'file_size': -1,
         'file_type': None,
         'file_guid': None,
         'nentries' : 0, # to handle empty files
@@ -1068,6 +1069,7 @@ class FilePeeker(object):
             f['file_md5sum'] = self.server.md5sum(f_raw)
             f['file_name'] = file_name
             f['file_type'] = file_type
+            f['file_size'] = f_raw.GetSize()
             if file_type == 'pool':
                 f_root = self._root_open(fname, raw=False)
                 # POOL files are most nutritious when known to PoolFileCatalog.xml
@@ -1183,6 +1185,7 @@ class FilePeeker(object):
                                                      evtmax=evtmax,
                                                      full_details=False)
                 del bs_fileinfos['file_name']
+                del bs_fileinfos['file_size']
                 del bs_fileinfos['file_type']
                 del bs_fileinfos['file_md5sum']
                 f.update(bs_fileinfos)

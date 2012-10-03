@@ -1,3 +1,10 @@
+2012-10-03  Sebastien Binet  <binet@cern.ch>
+
+	* tagging PyUtils-00-12-19
+	* add file_size metadata (in bytes)
+	* M python/AthFile/impl.py
+	* M bin/dump-athfile.py
+
 2012-09-18  Sebastien Binet  <binet@voatlas04.cern.ch>
 
 	* tagging PyUtils-00-12-18

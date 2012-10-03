@@ -66,12 +66,17 @@ if __name__ == "__main__":
     for fname in fnames:
         try:
             f = af.fopen(fname, evtmax=options.evtmax)
+            file_size = f.infos['file_size']/1024./1024.
+            if file_size < 0: file_size = None
+            else:             file_size = str(file_size)+' MB'
+            
             msg.info(':'*80)
             msg.info('::::: summary :::::')
             fmt = ' - %-15s: %s'
             print fmt % ('file md5',       f.infos['file_md5sum'])
             print fmt % ('file name',      f.infos['file_name'])
             print fmt % ('file type',      f.infos['file_type'])
+            print fmt % ('file size',      file_size)
             print fmt % ('file guid',      f.infos['file_guid'])
             print fmt % ('nentries',       f.infos['nentries'])
             print fmt % ('run number',     f.infos['run_number'])
