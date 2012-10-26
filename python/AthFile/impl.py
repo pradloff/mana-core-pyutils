@@ -1219,7 +1219,7 @@ class FilePeeker(object):
         import eformat as ef
 
         data_reader = ef.EventStorage.pickDataReader(fname)
-        assert data_reader and data_reader.good(), \
+        assert data_reader, \
                'problem picking a data reader for file [%s]'%fname
 
         beam_type   = '<beam-type N/A>'
@@ -1228,6 +1228,7 @@ class FilePeeker(object):
         except Exception,err:
             msg.warning ("problem while extracting beam-type information")
             pass
+
         beam_energy = '<beam-energy N/A>'
         try:
             beam_energy = data_reader.beamEnergy()
@@ -1275,6 +1276,7 @@ class FilePeeker(object):
             ('Stream','stream'),
             ('Project', 'projectTag'),
             ('LumiBlock', 'lumiblockNumber'),
+            ('run_number', 'runNumber'),
             ):
             if key_name in bs_metadata:
                 # no need: already in bs metadata dict
@@ -1290,6 +1292,17 @@ class FilePeeker(object):
         file_infos['conditions_tag'] = bs_metadata.get('conditions_tag', None)
         file_infos['bs_metadata'] = bs_metadata
 
+        if not data_reader.good():
+            # event-less file...
+            file_infos['run_number'].append(bs_metadata.get('run_number', 0))
+            file_infos['lumi_block'].append(bs_metadata.get('LumiBlock', 0))
+            # FIXME: not sure how to do that...
+            #stream_tags=[dict(stream_type=bs_metadata.get('Stream',''),
+            #                  stream_name=bs_metadata.get('Project', ''),
+            #                  obeys_lbk="N/A")]
+            #file_infos['stream_tags'].extend(stream_tags)
+            return file_infos
+        
         if evtmax == -1:
             evtmax = nentries
             
