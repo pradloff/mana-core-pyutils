@@ -42,9 +42,19 @@ if __name__ == "__main__":
                        default = 1,
                        type = int,
                        help = 'Maximum number of events to process in the file(s)')
+    parser.add_option( '--debug',
+                       dest = 'debug',
+                       default = False,
+                       action='store_true',
+                       help = 'enable debugging informations')
     
     (options, args) = parser.parse_args()
 
+    if options.debug:
+        os.environ['ATHFILE_DEBUG'] = '1'
+        os.environ['PYUTILS_SHUTUP_DEBUG'] = '1'
+        pass
+        
     fnames = []
     
     if len(args) > 0:

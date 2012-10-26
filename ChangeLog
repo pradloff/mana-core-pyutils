@@ -1,5 +1,9 @@
 2012-10-26  Sebastien Binet  <binet@voatlas04.cern.ch>
 
+	* tagging PyUtils-00-12-21
+	* adds --debug switch to printout more infos
+	* M bin/dump-athfile.py
+
 	* tagging PyUtils-00-12-20
 	* fix bug #97959: attempt at handling event-less bs-files
 	* M python/AthFile/impl.py
