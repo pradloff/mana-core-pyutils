@@ -346,7 +346,7 @@ class AthFileServer(object):
         tfiles[:] = []
 
     def msg(self):
-        return self._msg
+        return _get_msg()#self._msg
     
     def set_msg_lvl(self, lvl):
         self.msg().setLevel(lvl)
@@ -774,6 +774,25 @@ class AthFileServer(object):
             print >> fd, "]"
             print >> fd, "### EOF ###"
             fd.flush()
+        return
+    
+    def _load_db_cache(self, fname):
+        """load file informations from a sqlite file"""
+        import PyUtils.dbsqlite as dbsqlite
+        cache = dbsqlite.open(fname)
+        d = {}
+        for k,v in cache.iteritems():
+            d[k] = AthFile.from_infos(v)
+        return d
+        
+    def _save_db_cache(self, fname):
+        """save file informations using sqlite"""
+        import PyUtils.dbsqlite as dbsqlite
+        db = dbsqlite.open(fname,flags='w')
+        cache = self._cache
+        for k in cache:
+            db[k] = cache[k].fileinfos
+        db.close()
         return
     
     def _load_db_cache(self, fname):

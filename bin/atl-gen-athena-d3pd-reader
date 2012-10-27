@@ -737,6 +737,7 @@ def process(fnames, output, do_gen_protobuf=False):
         if gen_source(obj.name(), output, obj):
             print "** pb while generating source for [%s]" % obj.name()
             return 1
+
         # generate protobuf files
         if do_gen_protobuf:
             if gen_protobuf(obj.name(), output, obj):
