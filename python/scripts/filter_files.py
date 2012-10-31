@@ -121,7 +121,7 @@ def main(args):
             'evt-list': ','.join(evt_list),
             'run-list': '' if len(run_list)==0 else '-r '+','.join(run_list),
             'output': args.output,
-            'files':  ','.join(args.files),
+            'files':  ' '.join(args.files),
             }
         return subprocess.call(cmd.split())
     

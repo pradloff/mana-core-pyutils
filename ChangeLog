@@ -1,3 +1,9 @@
+2012-10-31  Sebastien Binet  <binet@cern.ch>
+
+	* tagging PyUtils-00-12-22
+	* bug #94500: pass a space-separated list of files to AtlCopyBSEvent
+	* M python/scripts/filter_files.py
+
 2012-10-26  Sebastien Binet  <binet@voatlas04.cern.ch>
 
 	* tagging PyUtils-00-12-21
