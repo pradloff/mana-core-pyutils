@@ -20,6 +20,8 @@ _suppression_dct = {
                'libSTLAddRflx.so'),
     'vector<vector<double> >': ('libMathCore.so',
                                 'libAtlasSTLAddReflexDict.so'),
+    'RooStats': ('libHistFactory.so',
+                 'libRooStats.so'),
     }
 
 def printDb( db, detailedDump = False ):
