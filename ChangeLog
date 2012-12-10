@@ -1,3 +1,8 @@
+2012-12-10 Ilija Vukotic <ivukotic@cern.ch>
+
+	* initial import of isDSinFAX.py
+	* tagging PyUtils-00-12-24
+
 2012-11-30  Sebastien Binet  <binet@voatlas04.cern.ch>
 
 	* tagging PyUtils-00-12-23
