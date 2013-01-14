@@ -226,10 +226,10 @@ def createUseList(workAreas, suppressList = ["WorkArea"]):
          cmtPkg.path = os.path.split(cmtPkg.path)
          pass
 
-      use = "use %s \t%s \t%s" % ( cmtPkg.name,
-                                   #cmtPkg.version,
-                                   "*",
-                                   cmtPkg.path )
+      use = "use %s \t%s \t%s -no_auto_imports" % \
+            ( cmtPkg.name,
+              "*", #cmtPkg.version,
+              cmtPkg.path )
       msg.debug( "\t%s" % use )
 
       uses.append( use )

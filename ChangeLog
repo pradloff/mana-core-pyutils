@@ -1,3 +1,9 @@
+2013-01-14  Sebastien Binet  <binet@cern.ch>
+
+	* tagging PyUtils-00-12-25
+	* appease checkreq (and list use-pkgs with -no_auto_imports)
+	* M python/WorkAreaLib.py
+
 2012-12-10 Ilija Vukotic <ivukotic@cern.ch>
 
 	* initial import of isDSinFAX.py
