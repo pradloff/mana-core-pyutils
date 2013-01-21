@@ -1,3 +1,9 @@
+2013-01-21  Sebastien Binet  <binet@cern.ch>
+
+	* tagging PyUtils-00-12-26
+	* adding wscript file
+	* A wscript
+
 2013-01-14  Sebastien Binet  <binet@cern.ch>
 
 	* tagging PyUtils-00-12-25
