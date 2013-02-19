@@ -1,3 +1,9 @@
+2013-02-19  Sebastien Binet  <binet@cern.ch>
+
+	* tagging PyUtils-00-12-27
+	* adding aliases for commands
+	* M wscript
+
 2013-01-21  Sebastien Binet  <binet@cern.ch>
 
 	* tagging PyUtils-00-12-26
