@@ -44,7 +44,7 @@ def main(args):
         pkg = client.find_pkg(pkg, check_tag=False)
         fpkg = pkg['packagePath']+pkg['packageName']
         if len(projects) > 1:
-            client.msg.info('pkg [%s] exists in more than 1 project: %s ==> will use last one')
+            client.msg.info('pkg [%s] exists in more than 1 project: %s ==> will use last one' % (pkg['packageName'], projects))
         elif len(projects) < 1:
             continue
         project = projects[-1]

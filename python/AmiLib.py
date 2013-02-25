@@ -21,7 +21,7 @@ if 0:
     
     rec_cmd = 'TCFormGetDependencyPackageVersionTree -expandedPackageID="*" -expandedTopContainerPackage="*" -groupName="AtlasProduction" -processingStep="production" -project="TagCollector" -releaseName="15.7.0"'.replace('"','').split(' ')
     res = amiclient.execute(rec_cmd)
-    dd = _x.xml2dict(ET.fromstring(res.transform('xml')))
+    dd = _x.xml2dict(ET.fromstring(res.output('xml')))
     dd['AMIMessage']['Result']['tree']
 
 
@@ -32,7 +32,7 @@ if 0:
     -processingStep=production -project=TagCollector -releaseName=15.7.0
     """.replace("\n","").split()
     res = amiclient.execute(cmd)
-    d = _x.xml2dict(ET.fromstring(res.transform('xml')))
+    d = _x.xml2dict(ET.fromstring(res.output('xml')))
 
     # only the leaf packages in groupName="AtlasProduction"
     cmd = """
@@ -41,7 +41,7 @@ if 0:
     -processingStep='production' -project='TagCollector' -releaseName='15.7.0'
     """.replace("\n","").split()
     res = amiclient.execute(cmd)
-    d = _x.xml2dict(ET.fromstring(res.transform('xml')))
+    d = _x.xml2dict(ET.fromstring(res.output('xml')))
 
 
 
@@ -56,7 +56,7 @@ if 0:
     -releaseName=15.7.0
     """.replace("\n","").split()
     res = amiclient.execute(cmd)
-    d = _x.xml2dict(ET.fromstring(res.transform('xml')))
+    d = _x.xml2dict(ET.fromstring(res.output('xml')))
 
     # ami dataset:
     cmd = """
@@ -64,7 +64,7 @@ if 0:
     -logicalDatasetName=data09_900GeV.00142404.physics_RNDM.merge.AOD.f193_m320
     """.replace("\n","").split()
     res = amiclient.execute(cmt)
-    d = _x.xml2dict(ET.fromstring(res.transform('xml')))
+    d = _x.xml2dict(ET.fromstring(res.output('xml')))
 
     """
     [amiCommand] 
@@ -88,28 +88,28 @@ if 0:
         c = A.Client()
         try:
             res = c.exec_cmd(cmd="GetDatasetInfo", logicalFileName=n)
-            dd = _x.xml2dict(ET.fromstring(res.transform('xml')))
+            dd = _x.xml2dict(ET.fromstring(res.output('xml')))
             return dd['AMIMessage']['Result']
-        except A.PyAmi.AMI_Error:
+        except PyAmi.AMI_Error:
             # maybe a logical dataset name ?
             res = c.exec_cmd(cmd="GetDatasetInfo", logicalDatasetName=n)
-            dd = _x.xml2dict(ET.fromstring(res.transform('xml')))
+            dd = _x.xml2dict(ET.fromstring(res.output('xml')))
             return dd['AMIMessage']['Result']
             
 ### imports -------------------------------------------------------------------
 import os
 import sys
 
-import pyAMI.pyAMI as PyAmi
+import pyAMI.client as PyAmi
+import pyAMI.auth as PyAmiAuth
+
 from PyUtils.xmldict import xml2dict
 
 ### globals -------------------------------------------------------------------
 
 ### functions -----------------------------------------------------------------
 def ami_todict(res):
-    import PyUtils.xmldict as _x
-    import xml.etree.cElementTree as ET
-    return  _x.xml2dict(ET.fromstring(res.transform('xml')))
+    return res.to_dict()
     
 def xmlstr_todict(s):
     import PyUtils.xmldict as _x
@@ -125,11 +125,22 @@ class Client(object):
     @staticmethod
     def instance(self):
         if Client._instance is None:
-            Client._instance = PyAmi.AMI(certAuth=True)
+            c = PyAmi.AMI()
+            import os.path as osp
+            if not osp.exists(PyAmiAuth.AMI_CONFIG):
+                PyAmiAuth.create_auth_config()
+                pass
+            c.read_config(PyAmiAuth.AMI_CONFIG)
+            Client._instance = c
         return Client._instance
 
     def __init__(self, certAuth=True, dry_run=False):
-        self._client = PyAmi.AMI(certAuth=certAuth)
+        self._client = PyAmi.AMI()
+        import os.path as osp
+        if not osp.exists(PyAmiAuth.AMI_CONFIG):
+            PyAmiAuth.create_auth_config()
+            pass
+        self._client.read_config(PyAmiAuth.AMI_CONFIG)
         import PyUtils.Logging as L
         self.msg = L.logging.getLogger('ami-client')
         self.msg.setLevel(L.logging.INFO)
@@ -201,7 +212,7 @@ class Client(object):
                 'could not resolve [%s] to full package path' %
                 (pkg,)
                 )
-        res_dict = result.getDict()
+        res_dict = result.to_dict()
         if not 'Element_Info' in res_dict:
             raise RuntimeError(
                 'could not resolve [%s] to full package path' %
@@ -290,33 +301,20 @@ class Client(object):
             res = self.exec_cmd(cmd='TCGetPackageVersionHistory',
                                 fullPackageName=full_pkg_name,
                                 releaseName=release)
-            d = ami_todict(res)['AMIMessage']['Result']
-            rows = d['rowset']
+            rows = res.rows()
             if isinstance(rows, dict):
                 rows = [rows]
-            ## print "---"
-            ## print dict(d)
-            ## print "---"
+            # print "---"
+            # print list(rows)
+            # print "---"
             for row in rows:
-                if not row['type'] in ('Package_version_history',
-                                       'Package_version_history_delete'):
-                    ## print "-- skip [%s]" % row['type']
-                    continue
-                fields = row['row']['field']
-                for field in fields:
-                    n = field.get('name', None)
-                    v = field.get('_text', None)
-                    ## print "[%s] => [%s]" % (n,v)
-                    if n == 'groupName':
-                        ## print "-->",v
-                        projects.append(v)
-                        #return v
+                projects.append(row.get('groupName'))
             if not projects:
                 self.msg.error(
                     "no project found for package [%s] and release [%s]",
                     full_pkg_name,
                     release)
-        except amilib.PyAmi.AMI_Error, err:
+        except PyAmi.AMI_Error, err:
             pass
         return projects
 
@@ -332,27 +330,14 @@ class Client(object):
             res = self.exec_cmd(cmd='TCGetPackageVersionHistory',
                                 fullPackageName=full_pkg_name,
                                 releaseName=release)
-            d = ami_todict(res)['AMIMessage']['Result']
-            rows = d['rowset']
+            rows = res.rows()
             if isinstance(rows, dict):
                 rows = [rows]
             ## print "---"
-            ## print dict(d)
+            ## print list(rows)
             ## print "---"
             for row in rows:
-                if not row['type'] in ('Package_version_history',
-                                       'Package_version_history_delete'):
-                    ## print "-- skip [%s]" % row['type']
-                    continue
-                fields = row['row']['field']
-                for field in fields:
-                    n = field.get('name', None)
-                    v = field.get('_text', None)
-                    ## print "[%s] => [%s]" % (n,v)
-                    if n == 'packageTag':
-                        ## print "-->",v
-                        versions.append(v)
-                        #return v
+                versions.append(row.get('packageTag'))
             if not versions:
                 self.msg.error(
                     "no version found for package [%s] and release [%s]",
@@ -375,27 +360,15 @@ class Client(object):
                                 groupName=project,
                                 withDep=True,
                                 releaseName=release)
-            d = ami_todict(res)['AMIMessage']['Result']
-            rows = d['rowset'].get('row',[])
+            rows = res.rows()
             if isinstance(rows, dict):
                 rows = [rows]
 
             for row in rows:
-                fields = row['field']
-                packageTag = None
-                fullPackageName = None
-                groupName = None
-                releaseName = None
-                for f in fields:
-                    if f['name'] == 'fullPackageName':
-                        fullPackageName = f['_text']
-                    elif f['name'] == 'packageTag':
-                        packageTag = f['_text']
-                    elif f['name'] == 'releaseName':
-                        releaseName = f['_text']
-                    elif f['name'] == 'groupName':
-                        groupName = f['_text']
-
+                packageTag = row.get('packageTag', None)
+                fullPackageName = row.get('fullPackageName', None)
+                groupName = row.get('groupName', None)
+                releaseName = row.get('releaseName', None)
                 versions.append((groupName,releaseName,fullPackageName,packageTag))
                 
             # If more than one result, match full package name
@@ -439,8 +412,7 @@ class Client(object):
                 " and release [%s]" % (project, release,)
                 )
         import xml.etree.cElementTree as ET
-        rxml = result.transform('xml')
-        d = xml2dict(ET.fromstring(rxml))
+        d = result.to_dict()
 
         out = d
         abs_path = ('AMIMessage', 'Result', 'tree', 'treeBranch',)
@@ -468,7 +440,7 @@ class Client(object):
                 "Could not find open releases in project %s" % project
                 )
 
-        rxml = result.transform('xml')
+        rxml = result.output('xml')
         import xml.etree.cElementTree as ET
    
         try:
@@ -509,7 +481,7 @@ class Client(object):
                 'error executing TCListPackageVersionClient'
                 )
         
-        rxml = result.transform('xml')
+        rxml = result.output('xml')
         import xml.etree.cElementTree as ET
         try:
             rows = xml2dict(ET.fromstring(rxml))['AMIMessage']["Result"]["rowset"]['row']
