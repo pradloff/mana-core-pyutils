@@ -52,27 +52,17 @@ def _get_projects(client, release, pkg):
         res = client.exec_cmd(cmd='TCGetPackageVersionHistory',
                               fullPackageName=full_pkg_name,
                               releaseName=release)
-        d = amilib.ami_todict(res)['AMIMessage']['Result']
-        rows = d['rowset']
+        rows = res.rows()
         if isinstance(rows, dict):
             rows = [rows]
         ## print "---"
-        ## print dict(d)
+        ## print list(rows)
         ## print "---"
         for row in rows:
-            if not row['type'] in ('Package_version_history',
-                                   'Package_version_history_delete'):
-                ## print "-- skip [%s]" % row['type']
-                continue
-            fields = row['row']['field']
-            for field in fields:
-                n = field.get('name', None)
-                v = field.get('_text', None)
-                ## print "[%s] => [%s]" % (n,v)
-                if n == 'groupName':
-                    ## print "-->",v
-                    projects.append(v)
-                    #return v
+            v = row.get('groupName')
+            if not v in projects:
+                projects.append(v)
+            
         if not projects:
             print "::: no project found for package [%s] and release [%s]" % (
                 full_pkg_name,
