@@ -1,3 +1,9 @@
+2013-02-28  Frank Winklmeier  <fwinkl@cern>
+	
+	* tagging PyUtils-00-13-02
+	* python/scripts/tc_submit_tag.py: All authentication handled by
+	pyAMI directly (remove --user and --password command line args)
+
 2013-02-26  Sebastien Binet  <binet@cern.ch>
 
 	* tagging PyUtils-00-13-01

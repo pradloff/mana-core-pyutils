@@ -112,12 +112,6 @@ def query_release(releases, project):
         return ','.join(releases)
     return choice
    
-def valid_certificate():
-    return (
-        'X509_USER_PROXY' in os.environ and
-        osp.exists(os.environ['X509_USER_PROXY'])
-        )
-
 def submit_tag(client, args, pkg, tag):
    """Submit tag"""
 
@@ -126,10 +120,6 @@ def submit_tag(client, args, pkg, tag):
    cmd_args['fullPackageName'] = pkg
    cmd_args['packageTag'] = tag
    cmd_args['autoDetectChanges'] = 'yes'
-
-   if args.user and args.password:
-      cmd_args['AMIUser'] = args.user
-      cmd_args['AMIPass'] = args.password
 
    if args.justification: cmd_args['justification'] = args.justification
    if args.savannah: cmd_args['bugReport'] = args.savannah
@@ -162,10 +152,6 @@ def submit_tag(client, args, pkg, tag):
     metavar='BUG',
     help='savannah bug report number')
 @acmdlib.argument(
-    '-u', '--user',
-    action='store',
-    help="AMI user name (if $AMIUser not set and no voms-proxy)")
-@acmdlib.argument(
     '-b','--bundle',
     action='store',
     help="Bundle name (stays incomplete)")
@@ -174,11 +160,6 @@ def submit_tag(client, args, pkg, tag):
     action='store_true',
     default=False,
     help="Do not send confirmation email")
-@acmdlib.argument(
-    '--password',
-    default='',
-    help='password for AMI. do not use in clear text !'
-    )
 @acmdlib.argument(
     '--dry-run',
     action='store_true',
@@ -207,12 +188,7 @@ def main(args):
     For any required argument that is not specified on the command line,
     an interactive query is presented. Some text fields support history (arrow keys).
 
-    To authenticate via your grid certificate, set:
-     export X509_USER_PROXY=~/private/x509proxy 
-    and execute in a separate shell(!) (or via bash -c)
-    source /afs/cern.ch/project/gd/LCG-share/current/etc/profile.d/grid_env.sh
-    voms-proxy-init -voms atlas -out X509_USER_PROXY'
-    Once created the voms proxy is usable from any machine that has access to it.
+    Authentication is handled via pyAMI (see https://atlas-ami.cern.ch/AMI/pyAMI)
     """
 
     import PyUtils.AmiLib as amilib
@@ -309,20 +285,8 @@ def main(args):
     # If only one tag given, submit this tag to all releases
     if len(pkg_list)==1: pkg_list = pkg_list*len(args.release)
                     
-    ok = False
-    if valid_certificate():
-        args.password = None
-        choice = raw_input("Submit tag? [Y/n] ")      
-        ok = len(choice)==0 or choice.upper()=="Y"
-    else:
-        # Get user name via env var or prompt
-        if not args.user: args.user = os.environ.get("AMIUser",None) 
-        if not args.user: args.user = os.environ.get("USER",None) 
-        if not args.user: args.user = raw_input("AMI user name: ")
-      
-        if not args.password:
-            args.password = getpass.getpass("Enter AMI password to submit: ")
-        ok = len(args.password)>0
+    choice = raw_input("Submit tag? [Y/n] ")      
+    ok = len(choice)==0 or choice.upper()=="Y"
 
     if args.dry_run:
         client.dry_run = args.dry_run
