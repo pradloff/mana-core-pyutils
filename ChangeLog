@@ -1,3 +1,9 @@
+2013-03-29  Sebastien Binet  <binet@lxplus434.cern.ch>
+
+	* tagging PyUtils-00-13-03
+	* fixing (part of) bug #100920: use rstrip to remove unwanted stray NULLs
+	* M python/AthFile/impl.py
+
 2013-02-28  Frank Winklmeier  <fwinkl@cern>
 	
 	* tagging PyUtils-00-13-02

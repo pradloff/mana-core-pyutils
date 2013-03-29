@@ -998,13 +998,19 @@ class FilePeeker(object):
             schema = f.Get('Schema') if f else None
             if schema:
                 is_tag  = True
-                tag_ref = schema.m_eventRefColumnName
+                # note: we use .rstrip('\0') b/c of the change in semantics
+                # in PyROOT (char[] and const char* may not mean the same thing)
+                # see https://savannah.cern.ch/bugs/?100920 for the gory details
+                tag_ref = schema.m_eventRefColumnName.rstrip('\0')
             del schema
             metadata= f.Get('CollectionMetadata') if f else None
             if metadata:
                 metadata.GetEntry(0)
+                # note: we use .rstrip('\0') b/c of the change in semantics
+                # in PyROOT (char[] and const char* may not mean the same thing)
+                # see https://savannah.cern.ch/bugs/?100920 for the gory details
                 # make sure it is what we think it is
-                assert metadata.Key == 'POOLCollectionID' 
+                assert metadata.Key.rstrip('\0') == 'POOLCollectionID' 
                 tag_guid = metadata.Value
             del metadata
             coll_tree = f.Get('POOLCollectionTree') if f else None
