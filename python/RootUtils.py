@@ -206,10 +206,10 @@ class RootFileDumper(object):
 
         tree = self.tree
         nentries = tree.GetEntries()
-        branches = sorted([b.GetName() for b in tree.GetListOfBranches()])
-        if leaves is None:
-            leaves = branches
-
+        branches = sorted([b.GetName().rstrip('\0') for b in tree.GetListOfBranches()])
+        if leaves is None: leaves = branches
+        else:              leaves = [str(b).rstrip('\0') for b in leaves]
+        
         # handle itr_entries
         if isinstance(itr_entries, basestring):
             if ':' in itr_entries:

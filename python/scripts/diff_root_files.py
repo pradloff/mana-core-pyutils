@@ -14,6 +14,7 @@ ROOT = ru.import_root()
 
 ### globals -------------------------------------------------------------------
 g_ALLOWED_MODES = ('summary', 'detailed')
+g_ALLOWED_ERROR_MODES = ('bailout', 'resilient')
 g_args = None
 
 ### classes -------------------------------------------------------------------
@@ -22,6 +23,10 @@ g_args = None
 def _is_summary():
     global g_args
     return g_args.mode == 'summary'
+
+def _is_exit_early():
+    global g_args
+    return g_args.error_mode == 'bailout'
 
 @acmdlib.command(name='diff-root')
 @acmdlib.argument('old',
@@ -61,6 +66,17 @@ default='%(default)s'.
 allowed: %(choices)s
 """
                   )
+@acmdlib.argument('--error-mode',
+                  choices=g_ALLOWED_ERROR_MODES,
+                  default='bailout',
+                  help="""\
+Enable a particular error mode.
+  'bailout':   bail out on first error.
+  'resilient': keep running.
+default='%(default)s'.
+allowed: %(choices)s
+"""
+                  )
 def main(args):
     """check that 2 ROOT files have same content (containers and sizes)
     """
@@ -85,6 +101,7 @@ def main(args):
     msg.info('hacks:          %s', args.known_hacks)
     msg.info('entries:        %s', args.entries)
     msg.info('mode:           %s', args.mode)
+    msg.info('error mode:     %s', args.error_mode)
 
     import PyUtils.Helpers as H
     with H.ShutUp() :
@@ -142,6 +159,7 @@ def main(args):
                       fnew.dump(args.tree_name, itr_entries)):
             tree_name, ientry, name, iold = d[0]
             _,              _,    _, inew = d[1]
+            name[0] = name[0].rstrip('\0')
             if ((not (name[0] in leaves)) or
                 # FIXME: that's a plain (temporary?) hack
                 name[-1] in args.known_hacks):
@@ -166,6 +184,10 @@ def main(args):
                 # remember for later
                 fold.allgood = False
                 fnew.allgood = False
+
+                if _is_exit_early():
+                    print "*** exit on first error ***"
+                    break
                 continue
             
             n = '.'.join(map(str, ["%03i"%ientry]+name))

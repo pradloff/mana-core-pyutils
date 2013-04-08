@@ -1,3 +1,11 @@
+2013-04-08  Sebastien Binet  <binet@cern.ch>
+
+	* tagging PyUtils-00-13-04
+	* diff-root: add an --error-mode switch to better customize when to
+	  stop the diffing process.
+	* M python/scripts/diff_root_files.py
+	* M python/RootUtils.py
+
 2013-03-29  Sebastien Binet  <binet@lxplus434.cern.ch>
 
 	* tagging PyUtils-00-13-03
