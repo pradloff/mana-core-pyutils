@@ -998,19 +998,29 @@ class FilePeeker(object):
             schema = f.Get('Schema') if f else None
             if schema:
                 is_tag  = True
-                # note: we use .rstrip('\0') b/c of the change in semantics
-                # in PyROOT (char[] and const char* may not mean the same thing)
+                # note: we used to use .rstrip('\0') b/c of the change in
+                # semantics in PyROOT (char[] and const char* may not mean
+                # the same thing)
                 # see https://savannah.cern.ch/bugs/?100920 for the gory details
-                tag_ref = schema.m_eventRefColumnName.rstrip('\0')
+                # but in the end, we use ctypes...
+                # see https://savannah.cern.ch/bugs/?101200 for the gory details
+                import ctypes
+                tag_ref = str(ctypes.c_char_p(schema.m_eventRefColumnName).value)
             del schema
             metadata= f.Get('CollectionMetadata') if f else None
             if metadata:
-                metadata.GetEntry(0)
-                # note: we use .rstrip('\0') b/c of the change in semantics
-                # in PyROOT (char[] and const char* may not mean the same thing)
+                nbytes = metadata.GetEntry(0)
+                # note: we used to use .rstrip('\0') b/c of the change in
+                # semantics in PyROOT (char[] and const char* may not mean
+                # the same thing)
                 # see https://savannah.cern.ch/bugs/?100920 for the gory details
+                # but in the end, we use ctypes...
+                # see https://savannah.cern.ch/bugs/?101200 for the gory details
+                # 
                 # make sure it is what we think it is
-                assert metadata.Key.rstrip('\0') == 'POOLCollectionID' 
+                import ctypes
+                key_name = str(ctypes.c_char_p(metadata.Key).value)
+                assert key_name == 'POOLCollectionID' 
                 tag_guid = metadata.Value
             del metadata
             coll_tree = f.Get('POOLCollectionTree') if f else None

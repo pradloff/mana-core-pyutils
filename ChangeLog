@@ -1,3 +1,10 @@
+2013-04-24  Sebastien Binet  <binet@cern.ch>
+
+	* tagging PyUtils-00-13-05
+	* fixing bug #101200: use ctypes instead of .rstrip(0) to remove
+	  unwanted stray NULLs
+	* M python/AthFile/impl.py
+
 2013-04-08  Sebastien Binet  <binet@cern.ch>
 
 	* tagging PyUtils-00-13-04
