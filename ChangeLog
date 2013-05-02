@@ -1,3 +1,10 @@
+2013-05-02  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-13-06
+	* fixing bug #101385: use ctypes to remove unwanted stray NULLs
+	  (also to extract tag_guid)
+	* M python/AthFile/impl.py
+
 2013-04-24  Sebastien Binet  <binet@cern.ch>
 
 	* tagging PyUtils-00-13-05

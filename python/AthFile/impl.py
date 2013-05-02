@@ -1021,7 +1021,7 @@ class FilePeeker(object):
                 import ctypes
                 key_name = str(ctypes.c_char_p(metadata.Key).value)
                 assert key_name == 'POOLCollectionID' 
-                tag_guid = metadata.Value
+                tag_guid = str(ctypes.c_char_p(metadata.Value).value)
             del metadata
             coll_tree = f.Get('POOLCollectionTree') if f else None
             if coll_tree:
