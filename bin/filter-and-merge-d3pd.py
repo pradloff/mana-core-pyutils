@@ -142,7 +142,8 @@ def apply_filters(branches, patterns):
 def merge_all_trees(fnames, tree_name, memory, sfo,
                     vars_fname=None, grl_fname=None,
                     filter_fct=None,
-                    keep_all_trees=False):
+                    keep_all_trees=False,
+                    apply_recursive_opt=True):
     
     oname = sfo[:]
     if not oname.endswith(".root"):
@@ -208,24 +209,26 @@ def merge_all_trees(fnames, tree_name, memory, sfo,
         del f
         pass # loop over trees
 
-    while 1: # recursive optimization
-        tot_mem = sum(basket_sz)
-        if tot_mem < memory:
-            break
+    if apply_recursive_opt:
+        while 1: # recursive optimization
+            tot_mem = sum(basket_sz)
+            if tot_mem < memory:
+                break
 
-        max_spare = -1
-        max_spare_idx = None
-        for i in xrange(nleaves):
-            spare = tot_sz[i]/baskets[i] - tot_sz[i]/(baskets[i]+1)
-            if max_spare < spare:
-                max_spare = spare
-                max_spare_idx = i
-        if max_spare_idx is not None:
-            idx = max_spare_idx
-            baskets[idx] += 1
-            basket_sz[idx] = tot_sz[idx]/baskets[idx]
-        pass # end-while
-
+            max_spare = -1
+            max_spare_idx = None
+            for i in xrange(nleaves):
+                spare = tot_sz[i]/baskets[i] - tot_sz[i]/(baskets[i]+1)
+                if max_spare < spare:
+                    max_spare = spare
+                    max_spare_idx = i
+            if max_spare_idx is not None:
+                idx = max_spare_idx
+                baskets[idx] += 1
+                basket_sz[idx] = tot_sz[idx]/baskets[idx]
+            pass # end-while
+        pass # apply_recursive_opt
+    
     # create the new (optimized) tree
     new_tree = orig_tree.CloneTree(0) # no copy of events
     new_tree.ResetBit(ROOT.kCanDelete)
@@ -274,37 +277,39 @@ def merge_all_trees(fnames, tree_name, memory, sfo,
             other_trees.append(_new_tree)
             del _old_tree
         print "::: capturing other trees to filter and merge... [done]"
-        
-    # setting optimized basket sizes
-    tot_mem = 0.
-    tot_bkt = 0
-    max_bkt = 0
-    min_bkt = 1024**3
 
-    for ibr in xrange(nleaves):
-        br = new_tree.GetBranch(br_names[ibr])
-        if basket_sz[ibr] == 0:
-            basket_sz[ibr] = 16
+    if apply_recursive_opt:
+        # setting optimized basket sizes
+        tot_mem = 0.
+        tot_bkt = 0
+        max_bkt = 0
+        min_bkt = 1024**3
 
-        basket_sz[ibr] = basket_sz[ibr] - (basket_sz[ibr] % 8)
-        br.SetBasketSize(basket_sz[ibr])
+        for ibr in xrange(nleaves):
+            br = new_tree.GetBranch(br_names[ibr])
+            if basket_sz[ibr] == 0:
+                basket_sz[ibr] = 16
 
-        tot_mem += basket_sz[ibr]
-        tot_bkt += baskets[ibr]
+            basket_sz[ibr] = basket_sz[ibr] - (basket_sz[ibr] % 8)
+            br.SetBasketSize(basket_sz[ibr])
 
-        if basket_sz[ibr] < min_bkt:
-            min_bkt = basket_sz[ibr]
-        if basket_sz[ibr] > max_bkt:
-            max_bkt = basket_sz[ibr]
-            
-        pass # loop over leaves
+            tot_mem += basket_sz[ibr]
+            tot_bkt += baskets[ibr]
 
-    print "::: optimize baskets: "
-    print ":::   total memory buffer: %8.3f kb" % (tot_mem/1024,)
-    print ":::   total baskets:       %8.3f (min= %8.3f) (max= %8.3f) kb" % (
-        tot_bkt, min_bkt, max_bkt)
+            if basket_sz[ibr] < min_bkt:
+                min_bkt = basket_sz[ibr]
+            if basket_sz[ibr] > max_bkt:
+                max_bkt = basket_sz[ibr]
 
-    del tot_sz, basket_sz, baskets
+            pass # loop over leaves
+
+        print "::: optimize baskets: "
+        print ":::   total memory buffer: %8.3f kb" % (tot_mem/1024,)
+        print ":::   total baskets:       %8.3f (min= %8.3f) (max= %8.3f) kb" % (
+            tot_bkt, min_bkt, max_bkt)
+
+        del tot_sz, basket_sz, baskets
+        pass # apply_recursive_opt
 
     # copying data
     n_pass = 0
@@ -517,6 +522,7 @@ def main():
         "in=", "out=", "tree=", "var=", "maxsize=", "grl=", "fakeout",
         "selection=",
         "keep-all-trees",
+        "disable-recursive-opt",
         "help"
         ]
     _error_msg = """\
@@ -547,6 +553,9 @@ Accepted command line options:
                                                 return t.eg_px[0] > 10000
                                            NOTE: the function must be named 'filter_fct' and take the tree as a parameter
      --keep-all-trees                 ...  keep, filter and merge all other trees.
+     --disable-recursive-opt          ...  switch to disable a recursive (size)
+                                           optimization. (The recursive optimization
+                                           might be excessively SLOW on large n-tuples.)
  """
 
     for arg in sys.argv[1:]:
@@ -560,6 +569,7 @@ Accepted command line options:
     opts.fake_output = False
     opts.selection = None
     opts.keep_all_trees = False
+    opts.apply_recursive_opt = True
     
     try:
         optlist, args = getopt.getopt(_opts, _useropts, _userlongopts)
@@ -595,6 +605,9 @@ Accepted command line options:
 
         elif opt in ('--keep-all-trees',):
             opts.keep_all_trees = True
+
+        elif opt in ('--disable-recursive-opt',):
+            opts.apply_recursive_opt = False
             
         elif opt in ("-h", "--help"):
             print _error_msg
@@ -630,7 +643,8 @@ Accepted command line options:
         print "::: creation of fake-output (if needed) [ON]"
     print "::: user filter:   ",opts.selection
     print "::: keep all trees:", opts.keep_all_trees
-
+    print "::: recursive opt: ", opts.apply_recursive_opt
+    
     # slightly increase the max size (so that the manual ChangeFile at 0.9 of
     # the current MaxTreeSize will fall within the user-provided one...)
     ROOT.TTree.SetMaxTreeSize(long(opts.maxsize * 1024 * 1024 / 0.9))
@@ -706,7 +720,8 @@ Accepted command line options:
                     vars_fname=opts.vars_fname,
                     grl_fname=opts.grl_fname,
                     filter_fct=filter_fct,
-                    keep_all_trees=opts.keep_all_trees)
+                    keep_all_trees=opts.keep_all_trees,
+                    apply_recursive_opt=opts.apply_recursive_opt)
 
     timer.Stop()
 

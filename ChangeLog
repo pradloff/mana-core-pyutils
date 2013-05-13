@@ -1,3 +1,9 @@
+2013-05-13  Sebastien Binet  <binet@voatlas04.cern.ch>
+
+	* tagging PyUtils-00-13-07
+	* add --disable-recursive-opt: useful for large n-tuples (python is recursively slow)
+	* M bin/filter-and-merge-d3pd.py
+
 2013-05-02  Sebastien Binet  <binet@farnsworth>
 
 	* tagging PyUtils-00-13-06
