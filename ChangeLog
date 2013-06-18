@@ -1,3 +1,10 @@
+2013-06-18  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-13-08
+	* try to cater for CMTUSERCONTEXT which might inject a
+	  non-writeable path in CTMPATH (at first position)
+	* M python/WorkAreaLib.py
+
 2013-05-13  Sebastien Binet  <binet@voatlas04.cern.ch>
 
 	* tagging PyUtils-00-13-07
