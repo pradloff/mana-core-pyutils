@@ -1,3 +1,9 @@
+2013-07-01   Grigori Rybkine <Grigori.Rybkine@cern.ch>
+
+	* python/WorkAreaLib.py: Get install area location from cmt
+	so that it is correct whether CMTUSERCONTEXT is set or not
+	* tagging PyUtils-00-13-09
+	
 2013-06-18  Sebastien Binet  <binet@farnsworth>
 
 	* tagging PyUtils-00-13-08

@@ -21,12 +21,12 @@ _ignore_dir_list = [
     "InstallArea",
     ]
 
-def _get_cmtpath():
-    for p in os.environ['CMTPATH'].split(os.pathsep):
-        if os.access(p, os.W_OK):
-            return p
-    raise OSError('no write-able directory among $CMTPATH entries (%s)' %
-                  os.environ['CMTPATH'])
+def _get_currentpath():
+    from PyCmt.Cmt import CmtWrapper
+    cmt = CmtWrapper()
+    installarea = cmt.show(macro_value='CMTINSTALLAREA')
+    prefix = cmt.show(macro_value='cmt_installarea_prefix')
+    return installarea.rstrip(prefix).rstrip(os.sep)
 
 def _is_in_ignore_dir_list(pathname):
     return any(map(pathname.count, _ignore_dir_list))
@@ -275,7 +275,7 @@ def createWorkArea(workAreas = None, installDir = None,
         pass
     atlasRunTime = _translate_runtimepkg_name(runTimePkg)
     
-    defaultWorkArea = _get_cmtpath()
+    defaultWorkArea = _get_currentpath()
     if len(workAreas) <= 0:
         workAreas = [ defaultWorkArea ]
     if installDir == None:
