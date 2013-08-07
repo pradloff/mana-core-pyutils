@@ -243,13 +243,18 @@ def _processOptions( useropts, userlongopts ):
              log.info('got these non-fatal parsing errors:\n%s' % err)
           if (cfg.has_section('summary') and
               cfg.has_option('summary', 'AtlasProject')):
-             v = cfg.get('summary', 'AtlasProject')
-             v = v.lower()
-             if v.startswith('atlas'):
-                v = v[len('atlas'):]
-             runTimePkg = v
-             log.info('taking runtime package [%s] from .asetup.save',
-                      runTimePkg)
+             try:
+                v = cfg.get('summary', 'AtlasProject')
+                v = v.lower()
+                if v.startswith('atlas'):
+                   v = v[len('atlas'):]
+                runTimePkg = v
+                log.info('taking runtime package [%s] from .asetup.save',
+                         runTimePkg)
+             except Exception, err:
+                log.info('got this non-fatal parsing error:\n%s' % err)
+                log.info('taking runtime package [AtlasOffline] by default')
+                runTimePkg = None # offline
        else:
           # take it from env-var AtlasProject
           runTimePkg = None # 'offline'
