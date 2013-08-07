@@ -1,3 +1,9 @@
+2013-08-07  Sebastien Binet  <binet@voatlas04.cern.ch>
+
+	* tagging PyUtils-00-13-10
+	* dont crash and burn while retrieving AtlasProject from asetup.save
+	* M bin/setupWorkArea.py
+
 2013-07-01   Grigori Rybkine <Grigori.Rybkine@cern.ch>
 
 	* python/WorkAreaLib.py: Get install area location from cmt
