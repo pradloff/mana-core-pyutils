@@ -413,14 +413,56 @@ class AthFileServer(object):
                 return f
         return
 
-    def fopen(self, fname, evtmax=1):
+    def fopen(self, fnames, evtmax=1):
+        if isinstance(fnames, (list, tuple)):
+            self.msg().debug("using mp.pool...")
+            fct = _do_fopen
+            do_pers_cache = self._do_pers_cache
+            self.disable_pers_cache()
+            import multiprocessing as mp
+            pool_sz = 4
+            pool_sz = mp.cpu_count()
+            pool = mp.Pool(pool_sz)
+
+            infos = None
+            try:
+                setattr(self, '_evtmax', evtmax)
+                infos = pool.map(fct, fnames)
+            finally:
+                delattr(self, '_evtmax')
+                if do_pers_cache:
+                    self.enable_pers_cache()
+                    pass
+                pass
+            # collect back infos into ourself
+            for f in infos:
+                fname = f.infos['file_name']
+                self._cache[fname] = f
+                pass
+            # synchronize once
+            try:
+                self._sync_pers_cache()
+            except Exception, err:
+                self.msg().info('could not synchronize the persistent cache:\n%s', err)
+                pass
+                
+            return infos
+        return self._fopen_file(fnames, evtmax)
+        
+    def _fopen_stateless(self, fname, evtmax):
         msg = self.msg()
-        cache = {}
-        for k,v in self._cache.iteritems():
+        cache = dict(self._cache)
+        fids = []
+        for k,v in cache.iteritems():
             v = v.infos
             fid = v.get('file_md5sum', v['file_guid'])
+            fids.append((fid,k))
+            pass
+        for v in fids:
+            fid, k = v
             cache[fid] = k
-
+            pass
+        
         protocol, fname = self.fname(fname)
         if protocol in ('fid', 'lfn'):
             protocol, fname = self.fname(fname)
@@ -433,7 +475,7 @@ class AthFileServer(object):
                 use_cache = True
                 sync_cache = False
                 msg.debug('fetched [%s] from cache (md5sum is a match)', fname)
-                f = self._cache[cache[fid]]
+                f = cache[cache[fid]]
         elif protocol in ('ami',):
             use_cache = True
             sync_cache = True # yes, we want to update the pers. cache
@@ -443,9 +485,9 @@ class AthFileServer(object):
             fid = infos.get('file_md5sum', infos['file_guid'])
             cache[fid] = fname
             f = AthFile.from_infos(infos)
-            self._cache[fname] = f
+            cache[fname] = f
             # hysteresis...
-            self._cache[infos['file_name']] = f
+            cache[infos['file_name']] = f
         else:
             # use the cache indexed by name rather than md5sums to
             # skip one TFile.Open...
@@ -455,25 +497,37 @@ class AthFileServer(object):
                 use_cache = True
                 sync_cache = False
                 msg.debug('fetched [%s] from cache', fname)
-                f = self._cache[fname]
+                f = cache[fname]
 
         if not use_cache:
             msg.info("opening [%s]...", fname)
             infos = self._peeker(fname, evtmax)
             f = AthFile.from_infos(infos)
-            self._cache[fname] = f
+            cache[fname] = f
             # hysteresis...
-            self._cache[infos['file_name']] = f
+            cache[infos['file_name']] = f
             sync_cache = True
+            pass
 
+        # remove the fids we added...
+        for v in fids:
+            fid, k = v
+            del cache[fid]
+        
+        return (cache, sync_cache)
+
+    def _fopen_file(self, fname, evtmax):
+        msg = self.msg()
+        cache, sync_cache = self._fopen_stateless(fname, evtmax)
         if sync_cache:
             try:
+                self._cache = cache
                 self._sync_pers_cache()
             except Exception,err:
                 msg.info('could not synchronize the persistent cache:\n%s', err)
             pass
-        
-        return f
+        return self._cache[fname]
+    
     
     def md5sum(self, fname):
         """return the md5 checksum of file ``fname``
@@ -1337,3 +1391,10 @@ class FilePeeker(object):
 
     pass # class FilePeeker
 
+### globals
+g_server = AthFileServer()
+
+def _do_fopen(fname):
+    self = g_server
+    evtmax= getattr(g_server, '_evtmax', 1)
+    return self._fopen_file(fname, evtmax)
