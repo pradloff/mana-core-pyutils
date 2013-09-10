@@ -57,7 +57,7 @@ class ModuleFacade(types.ModuleType):
         self.__dict__['_impl']  = _impl
         self.__dict__['_guess_file_type'] = _guess_file_type
 
-        self.__dict__['server'] = _impl.AthFileServer()
+        self.__dict__['server'] = _impl.g_server
         
         import atexit
         atexit.register(self.shutdown)
@@ -124,8 +124,6 @@ class ModuleFacade(types.ModuleType):
         Note that if `fnames` is a list of filenames, then `fopen` returns a list
         of @c AthFile instances.
         """
-        if isinstance(fnames, (list, tuple)):
-            return [self.server.fopen(fname, evtmax) for fname in fnames]
         return self.server.fopen(fnames, evtmax)
 
     ## def __del__(self):
