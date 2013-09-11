@@ -650,7 +650,7 @@ class AthFileServer(object):
             # protect against empty or invalid (None) cache file names
             return
         import uuid
-        pid = str(os.getpid())+'-'+uuid.uuid4()
+        pid = str(os.getpid())+'-'+str(uuid.uuid4())
         fname_,fname_ext = os.path.splitext(fname)
         if fname_ext in ('.gz',):
             fname_,fname_ext = os.path.splitext(fname_)
