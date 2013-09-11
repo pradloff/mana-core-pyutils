@@ -1,3 +1,17 @@
+2013-09-11  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-12-21-02
+	* another attempt at fixing ATLASJT-84: open fnames in parallel.
+	* M python/AthFile/impl.py
+	* M bin/dump-athfile.py
+
+2013-09-10  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-12-21-01
+	* attempt at fixing ATLASJT-84: open fnames in parallel.
+	* M python/AthFile/__init__.py
+	* M python/AthFile/impl.py
+
 2012-10-26  Sebastien Binet  <binet@voatlas04.cern.ch>
 
 	* tagging PyUtils-00-12-21
