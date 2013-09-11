@@ -415,14 +415,14 @@ class AthFileServer(object):
 
     def fopen(self, fnames, evtmax=1):
         if isinstance(fnames, (list, tuple)):
-            self.msg().debug("using mp.pool...")
+            self.msg().debug("using mp.pool... (files=%s)" % len(fnames))
             fct = _do_fopen
             do_pers_cache = self._do_pers_cache
             self.disable_pers_cache()
             import multiprocessing as mp
-            pool_sz = 4
+            from multiprocessing.pool import ThreadPool
             pool_sz = mp.cpu_count()
-            pool = mp.Pool(pool_sz)
+            pool = ThreadPool(pool_sz)
 
             infos = None
             try:
@@ -649,7 +649,8 @@ class AthFileServer(object):
         if not fname:
             # protect against empty or invalid (None) cache file names
             return
-        pid = str(os.getpid())
+        import uuid
+        pid = str(os.getpid())+'-'+uuid.uuid4()
         fname_,fname_ext = os.path.splitext(fname)
         if fname_ext in ('.gz',):
             fname_,fname_ext = os.path.splitext(fname_)
@@ -1184,7 +1185,12 @@ class FilePeeker(object):
                             'evtmax': evtmax,
                             }
                         import os
-                        stdout = open('athfile-%i.log.txt' % os.getpid(), "a")
+                        import uuid
+                        stdout_fname = (
+                            'athfile-%i-%s.log.txt' %
+                            (os.getpid(), uuid.uuid4())
+                            )
+                        stdout = open(stdout_fname, "w")
                         print >> stdout,"="*80
                         print >> stdout,self._sub_env
                         print >> stdout,"="*80
