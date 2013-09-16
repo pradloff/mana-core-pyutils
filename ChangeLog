@@ -1,3 +1,10 @@
+2013-09-16  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-12-21-04
+	* fixing ATLASSIM-190: handle remote files (for which no guid are
+	  computed yet)
+	* M python/AthFile/impl.py
+
 2013-09-11  Sebastien Binet  <binet@farnsworth>
 
 	* tagging PyUtils-00-12-21-03

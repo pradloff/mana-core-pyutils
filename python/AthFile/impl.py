@@ -456,7 +456,8 @@ class AthFileServer(object):
         for k,v in cache.iteritems():
             v = v.infos
             fid = v.get('file_md5sum', v['file_guid'])
-            fids.append((fid,k))
+            if fid:
+                fids.append((fid,k))
             pass
         for v in fids:
             fid, k = v
