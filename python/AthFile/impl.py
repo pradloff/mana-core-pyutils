@@ -515,11 +515,11 @@ class AthFileServer(object):
             fid, k = v
             del cache[fid]
         
-        return (cache, sync_cache)
+        return (fname, cache, sync_cache)
 
     def _fopen_file(self, fname, evtmax):
         msg = self.msg()
-        cache, sync_cache = self._fopen_stateless(fname, evtmax)
+        fname, cache, sync_cache = self._fopen_stateless(fname, evtmax)
         if sync_cache:
             try:
                 self._cache = cache
@@ -528,7 +528,6 @@ class AthFileServer(object):
                 msg.info('could not synchronize the persistent cache:\n%s', err)
             pass
         return self._cache[fname]
-    
     
     def md5sum(self, fname):
         """return the md5 checksum of file ``fname``
