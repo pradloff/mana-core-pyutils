@@ -1,3 +1,10 @@
+2013-09-24  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-12-21-06
+	* split fopen into fopen and pfopen (its parallel cousin)
+	* M python/AthFile/impl.py
+	* M python/AthFile/__init__.py
+
 2013-09-17  Sebastien Binet  <binet@farnsworth>
 
 	* tagging PyUtils-00-12-21-05

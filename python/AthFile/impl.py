@@ -413,7 +413,7 @@ class AthFileServer(object):
                 return f
         return
 
-    def fopen(self, fnames, evtmax=1):
+    def pfopen(self, fnames, evtmax=1):
         if isinstance(fnames, (list, tuple)):
             self.msg().debug("using mp.pool... (files=%s)" % len(fnames))
             fct = _do_fopen
@@ -446,6 +446,15 @@ class AthFileServer(object):
                 self.msg().info('could not synchronize the persistent cache:\n%s', err)
                 pass
                 
+            return infos
+        return self._fopen_file(fnames, evtmax)
+        
+    def fopen(self, fnames, evtmax=1):
+        if isinstance(fnames, (list, tuple)):
+            infos = []
+            for fname in fnames:
+                info = self._fopen_file(fname, evtmax)
+                infos.append(info)
             return infos
         return self._fopen_file(fnames, evtmax)
         

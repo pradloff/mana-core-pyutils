@@ -124,7 +124,29 @@ class ModuleFacade(types.ModuleType):
         Note that if `fnames` is a list of filenames, then `fopen` returns a list
         of @c AthFile instances.
         """
+        if isinstance(fnames, (list, tuple)):
+            infos = []
+            for fname in fnames:
+                info = self.server.fopen(fname, evtmax)
+                infos.append(info)
+                pass
+            return infos
         return self.server.fopen(fnames, evtmax)
+
+    @_update_cache  # also decorate with _update_cache to pick-up the changes 
+    @_decos.forking # from the forked athfile server...
+    def pfopen(self, fnames, evtmax=1):
+        """
+        helper function to create @c AthFile instances
+        @param `fnames` name of the file (or a list of names of files) to inspect
+        @param `nentries` number of entries to process (for each file)
+        
+        Note that if `fnames` is a list of filenames, then `fopen` returns a list
+        of @c AthFile instances.
+
+        This is a parallel (multi-threaded) version of ``fopen``.
+        """
+        return self.server.pfopen(fnames, evtmax)
 
     ## def __del__(self):
     ##     self._mgr.shutdown()

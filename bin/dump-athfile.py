@@ -75,7 +75,7 @@ if __name__ == "__main__":
     msg = af.msg
     infos = []
     try:
-        infos = af.fopen(fnames, evtmax=options.evtmax)
+        infos = af.pfopen(fnames, evtmax=options.evtmax)
     except Exception, e:
         msg.error("Caught exception [%s] !!", str(e.__class__))
         msg.error("What:\n%s\n%s\n%s",e,
