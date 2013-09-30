@@ -73,54 +73,61 @@ if __name__ == "__main__":
     sc = 0
     import PyUtils.AthFile as af
     msg = af.msg
-    for fname in fnames:
-        try:
-            f = af.fopen(fname, evtmax=options.evtmax)
-            file_size = f.infos['file_size']/1024./1024.
-            if file_size < 0: file_size = None
-            else:             file_size = str(file_size)+' MB'
-            
-            msg.info(':'*80)
-            msg.info('::::: summary :::::')
-            fmt = ' - %-15s: %s'
-            print fmt % ('file md5',       f.infos['file_md5sum'])
-            print fmt % ('file name',      f.infos['file_name'])
-            print fmt % ('file type',      f.infos['file_type'])
-            print fmt % ('file size',      file_size)
-            print fmt % ('file guid',      f.infos['file_guid'])
-            print fmt % ('nentries',       f.infos['nentries'])
-            print fmt % ('run number',     f.infos['run_number'])
-            print fmt % ('run type',       f.infos['run_type'])
-            print fmt % ('evt number',     f.infos['evt_number'])
-            print fmt % ('evt type',       f.infos['evt_type'])
-            print fmt % ('lumi block',     f.infos['lumi_block'])
-            print fmt % ('beam energy',    f.infos['beam_energy'])
-            print fmt % ('beam type',      f.infos['beam_type'])
-            print fmt % ('stream tags',    f.infos['stream_tags'])
-            print fmt % ('stream names',   f.infos['stream_names'])
-            print fmt % ('geometry',       f.infos['geometry'])
-            print fmt % ('conditions tag', f.infos['conditions_tag'])
-            _metadata = f.infos['metadata']
-            _metadata = _metadata.keys() if isinstance(_metadata,dict) else None
-            print fmt % ('meta data',      _metadata)
-            
-            msg.info(':'*80)
-        except Exception, e:
-            msg.error("Caught exception [%s] !!", str(e.__class__))
-            msg.error("What:\n%s\n%s\n%s",e,
-                      sys.exc_info()[0],
-                      sys.exc_info()[1])
-            sc = 1
-            pass
+    infos = []
+    try:
+        infos = af.pfopen(fnames, evtmax=options.evtmax)
+    except Exception, e:
+        msg.error("Caught exception [%s] !!", str(e.__class__))
+        msg.error("What:\n%s\n%s\n%s",e,
+                  sys.exc_info()[0],
+                  sys.exc_info()[1])
+        sc = 1
+        pass
 
-        except :
-            msg.error("Caught something !! (don't know what)")
-            msg.error("\n%s\n%s",sys.exc_info()[0], sys.exc_info()[1])
-            sc = 10
-            pass
-        if len(fnames) > 1:
+    except :
+        msg.error("Caught something !! (don't know what)")
+        msg.error("\n%s\n%s",sys.exc_info()[0], sys.exc_info()[1])
+        sc = 10
+        pass
+
+    if sc != 0:
+        msg.info("Bye.")
+        sys.exit(sc)
+        pass
+    
+    for f in infos:
+        file_size = f.infos['file_size']/1024./1024.
+        if file_size < 0: file_size = None
+        else:             file_size = str(file_size)+' MB'
+
+        msg.info(':'*80)
+        msg.info('::::: summary :::::')
+        fmt = ' - %-15s: %s'
+        print fmt % ('file md5',       f.infos['file_md5sum'])
+        print fmt % ('file name',      f.infos['file_name'])
+        print fmt % ('file type',      f.infos['file_type'])
+        print fmt % ('file size',      file_size)
+        print fmt % ('file guid',      f.infos['file_guid'])
+        print fmt % ('nentries',       f.infos['nentries'])
+        print fmt % ('run number',     f.infos['run_number'])
+        print fmt % ('run type',       f.infos['run_type'])
+        print fmt % ('evt number',     f.infos['evt_number'])
+        print fmt % ('evt type',       f.infos['evt_type'])
+        print fmt % ('lumi block',     f.infos['lumi_block'])
+        print fmt % ('beam energy',    f.infos['beam_energy'])
+        print fmt % ('beam type',      f.infos['beam_type'])
+        print fmt % ('stream tags',    f.infos['stream_tags'])
+        print fmt % ('stream names',   f.infos['stream_names'])
+        print fmt % ('geometry',       f.infos['geometry'])
+        print fmt % ('conditions tag', f.infos['conditions_tag'])
+        _metadata = f.infos['metadata']
+        _metadata = _metadata.keys() if isinstance(_metadata,dict) else None
+        print fmt % ('meta data',      _metadata)
+
+        msg.info(':'*80)
+        if len(infos) > 1:
             print ""
-        pass # loop over fileNames
+        pass # loop over infos
     
     if options.oname:
         oname = options.oname
