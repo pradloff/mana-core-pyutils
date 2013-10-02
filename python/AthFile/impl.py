@@ -387,7 +387,7 @@ class AthFileServer(object):
         if do_close:
             f.Close()
         return md5.hexdigest()
-
+    
     def _root_open(self, fname):
         import PyUtils.Helpers as H
         # speed-up by tampering LD_LIBRARY_PATH to not load reflex-dicts
@@ -481,7 +481,11 @@ class AthFileServer(object):
         sync_cache = True
         if protocol in ('', 'file'):
             fid = self.md5sum(fname)
-            if fid in cache:
+            fid_in_cache = fid in cache
+            # also check the cached name in case 2 identical files
+            # are named differently or under different paths
+            fid_match_fname = cache[fid] == fname
+            if fid_in_cache and fid_match_fname:
                 use_cache = True
                 sync_cache = False
                 msg.debug('fetched [%s] from cache (md5sum is a match)', fname)
@@ -523,7 +527,7 @@ class AthFileServer(object):
         for v in fids:
             fid, k = v
             del cache[fid]
-        
+
         return (fname, cache, sync_cache)
 
     def _fopen_file(self, fname, evtmax):
