@@ -484,7 +484,7 @@ class AthFileServer(object):
             fid_in_cache = fid in cache
             # also check the cached name in case 2 identical files
             # are named differently or under different paths
-            fid_match_fname = cache[fid] == fname
+            fid_match_fname = cache.get(fid,None) == fname
             if fid_in_cache and fid_match_fname:
                 use_cache = True
                 sync_cache = False
