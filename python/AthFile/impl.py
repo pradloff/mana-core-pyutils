@@ -526,7 +526,10 @@ class AthFileServer(object):
         # remove the fids we added...
         for v in fids:
             fid, k = v
-            del cache[fid]
+            # in case there were duplicate fids
+            try:             del cache[fid]
+            except KeyError: pass
+            pass
 
         return (fname, cache, sync_cache)
 

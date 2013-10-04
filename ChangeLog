@@ -1,3 +1,9 @@
+2013-10-04  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-13-14
+	* fix fid removal to handle duplicates
+	* M python/AthFile/impl.py
+
 2013-10-03  Sebastien Binet  <binet@farnsworth>
 
 	* tagging PyUtils-00-13-13
