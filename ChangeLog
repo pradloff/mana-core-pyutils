@@ -1,3 +1,9 @@
+2013-10-10  Sebastien Binet  <binet@farnsworth>
+
+	* tagging PyUtils-00-13-15
+	* wscript: declare_xxx -> hwaf_declare_xxx
+	* M wscript
+
 2013-10-04  Sebastien Binet  <binet@farnsworth>
 
 	* tagging PyUtils-00-13-14
