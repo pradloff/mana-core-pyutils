@@ -58,7 +58,7 @@ def build(ctx):
         ("diffTAGTree",    "diffTAGTree.py"),
         ]:
         dst, src = i[0], i[1]
-        ctx.declare_runtime_alias(dst, src)
+        ctx.hwaf_declare_runtime_alias(dst, src)
         
     return
 ### EOF ###
